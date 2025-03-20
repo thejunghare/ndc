@@ -1,52 +1,52 @@
 import { NavLink } from "react-router-dom";
+import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 
 const LoginView = () => {
   return (
-    <div className="w-full max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold text-center">Login</h2>
-      <form className="space-y-4 mxt-4">
+    <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+      <h2 className="text-center text-2xl font-semibold">Login</h2>
+      <form className="mxt-4 space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            id="email"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Enter your email"
-          />
+          <div className="mb-2 block">
+            <Label htmlFor="email" value="Your email" />
+          </div>
+          <TextInput id="email" placeholder="name@company.com" required />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium">Password</label>
-          <input
-            type="password"
-            id="password"
-
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Enter your password"
-          />
+          <div className="mb-2 block">
+            <Label htmlFor="email" value="Your password" />
+          </div>
+          <TextInput id="password" type="password" required />
         </div>
 
-        <div className="mt-4 text-left">
-        <button
-          className="text-sm text-indigo-600 hover:text-indigo-700"
-        >
-           <NavLink to="/forgot-password">Forgot Password?</NavLink>
-        </button>
-      </div>
-
-        <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition">
-        <NavLink to="/dashboard">Login</NavLink> 
-        </button>
+        <div className="flex justify-between">
+          <div className="flex items-center gap-2">
+            <Checkbox id="remember" />
+            <Label htmlFor="remember">Remember me</Label>
+          </div>
+          <NavLink
+            to="/forgot-password"
+            className="text-sm text-cyan-700 hover:underline dark:text-cyan-500"
+          >
+            Lost password?
+          </NavLink>
+        </div>
+        <div className="w-full">
+          <Button>
+            <NavLink to="dashboard">Log in to your account</NavLink>
+          </Button>
+        </div>
+        <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
+          Not registered?&nbsp;
+          <a
+            href="#"
+            className="text-cyan-700 hover:underline dark:text-cyan-500"
+          >
+            <NavLink to="/create-account">Create account</NavLink>
+          </a>
+        </div>
       </form>
-
-      
-      <div className="mt-2 text-left">
-        <button
-          className="text-sm text-indigo-600 hover:text-indigo-700"
-        >
-          <NavLink to="/create-account">Create Account</NavLink>
-        </button>
-      </div>
     </div>
   );
 };

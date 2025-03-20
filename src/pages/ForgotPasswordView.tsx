@@ -1,33 +1,29 @@
-import {NavLink} from 'react-router-dom'
+import { NavLink } from "react-router-dom";
+import { TextInput, Button, Label } from "flowbite-react";
 
 const ForgotPasswordView = () => {
   return (
-    <div className="w-full max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold text-center">Forgot Password</h2>
-      <form className="space-y-4 mt-4">
+    <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+      <h2 className="text-center text-2xl font-semibold">Forgot Password</h2>
+      <form className="mt-4 space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            id="email"
-            
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Enter your email"
-          />
+          <div className="mb-2 block">
+            <Label htmlFor="email" value="Your Registered Email" />
+          </div>
+          <TextInput type="email" id="email" placeholder="Enter your email" />
         </div>
 
-        <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition">
-          Send Reset Link
-        </button>
+        <Button type="submit">Send Reset Link</Button>
       </form>
 
-      <div className="mt-4 text-center">
-        <button
-         
-          className="text-sm text-indigo-600 hover:text-indigo-700"
+      <div className="mt-2 flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
+        Remembered?&nbsp;
+        <a
+          href="#"
+          className="text-cyan-700 hover:underline dark:text-cyan-500"
         >
-        <NavLink to="/">Back to Login</NavLink>  
-        </button>
+          <NavLink to="/">Log In</NavLink>
+        </a>
       </div>
     </div>
   );
