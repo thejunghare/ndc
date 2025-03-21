@@ -1,15 +1,32 @@
+"use client";
+
+import { Button, Navbar } from "flowbite-react";
+
 const Header = () => {
-    return (
-        <div className="flex justify-center items-center h-10 bg-gray-500">
-            <h1 className="text-yellow-200 text-2xl">ITM|SFT</h1>
-            <ul>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-            </ul>
-        </div>
-    );
-}
+  return (
+    <Navbar fluid rounded>
+      <Navbar.Brand href="">
+        <img
+          src="../../public/ISU_LOGO.webp"
+          className="mr-3 h-6 sm:h-9"
+          alt="Flowbite React Logo"
+        />
+        {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+          Flowbite React
+        </span> */}
+      </Navbar.Brand>
+      <div className="flex md:order-2">
+        <Button>Logout</Button>
+        <Navbar.Toggle />
+      </div>
+      <Navbar.Collapse>
+        <Navbar.Link href="#" active>
+          Dashboard
+        </Navbar.Link>
+        <Navbar.Link href="#">About</Navbar.Link>
+      </Navbar.Collapse>
+    </Navbar>
+  );
+};
 
 export default Header;
