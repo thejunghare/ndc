@@ -4,10 +4,10 @@ import { Button, Navbar } from "flowbite-react";
 
 const Header = () => {
   return (
-    <Navbar fluid rounded>
+    <Navbar fluid rounded className="bg-white shadow-md dark:bg-gray-800">  
       <Navbar.Brand href="">
         <img
-          src="../../public/ISU_LOGO.webp"
+          src="/ISU_LOGO.webp"
           className="mr-3 h-6 sm:h-9"
           alt="Flowbite React Logo"
         />

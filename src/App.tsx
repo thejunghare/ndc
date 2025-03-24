@@ -4,6 +4,7 @@ import NotFoundView from "./pages/NotFoundView";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ForgotPasswordView from "./pages/ForgotPasswordView";
 import CreateAccountView from "./pages/CreateAccountView";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="*" element={<NotFoundView />} />
         <Route path="/forgot-password" element={<ForgotPasswordView />} />
         <Route path="/create-account" element={<CreateAccountView />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );

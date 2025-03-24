@@ -1,5 +1,5 @@
 "use client";
-import Header from "../component/header";
+import Header from "../reuseables/Header";
 import {
   Button,
   Modal,
@@ -12,8 +12,8 @@ import {
   Toast
 } from "flowbite-react";
 import React, { useState, useEffect } from "react";
-import SpinnerComponent from "../component/SpinnerComponent";
-import ToastComponent from "../component/ToastComponent";
+import SpinnerComponent from "../reuseables/SpinnerComponent";
+import ToastComponent from "../reuseables/ToastComponent";
 
 const DashboardView = () => {
   const [showSpinner, setShowSpinner] = useState(false);

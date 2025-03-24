@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
-import Header from "../component/header";
+import { Button, Checkbox, Label, TextInput, Select } from "flowbite-react";
+import Header from "@reuseables/Header";
 
 const LoginView = () => {
   return (
@@ -10,6 +10,18 @@ const LoginView = () => {
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
           <h2 className="text-center text-2xl font-semibold">Login</h2>
           <form className="mxt-4 space-y-4">
+
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="select" value="Select your role" />
+              </div>
+              <Select id="roles" required>
+                <option>Student</option>
+                <option>Admin</option>
+              </Select>
+            </div>
+
+
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="email" value="Your email" />

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Button, Label, TextInput } from "flowbite-react";
-import Header from "../component/header";
+import Header from "../reuseables/Header";
 
 const CreateAccountView = () => {
   return (
