@@ -1,39 +1,74 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom"; 
 import { Button, Checkbox, Label, TextInput, Select } from "flowbite-react";
-import Header from "@reuseables/Header";
+import Header from "../reuseables/Header";
+import { useState } from "react";
+import { useUser } from "../lib/UserContext";
 
 const LoginView = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [disable, setDisable] = useState<boolean>(false);
+  const [role, setRole] = useState<string>("Student"); 
+  const navigate = useNavigate();
+  const { login } = useUser();
+
+  const handleLogin = async (email: string, password: string) => {
+    setDisable(true);
+    try {
+      await login(email, password);
+      navigate(role === "Admin" ? "/admin-dashboard" : "/dashboard");
+    } catch (err) {
+      console.error(err);
+      setDisable(false);
+    }
+  };
+
   return (
     <div>
       <Header />
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
           <h2 className="text-center text-2xl font-semibold">Login</h2>
-          <form className="mxt-4 space-y-4">
-
+          <form className="mt-4 space-y-4">
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="select" value="Select your role" />
               </div>
-              <Select id="roles" required>
+              <Select
+                id="roles"
+                required
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
                 <option>Student</option>
                 <option>Admin</option>
               </Select>
             </div>
 
-
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="email" value="Your email" />
               </div>
-              <TextInput id="email" placeholder="name@company.com" required />
+              <TextInput
+                id="email"
+                placeholder="name@company.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="email" value="Your password" />
+                <Label htmlFor="password" value="Your password" />
               </div>
-              <TextInput id="password" type="password" required />
+              <TextInput
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
 
             <div className="flex justify-between">
@@ -48,19 +83,31 @@ const LoginView = () => {
                 Lost password?
               </NavLink>
             </div>
+
             <div className="w-full">
-              <Button>
-                <NavLink to="dashboard">Log in to your account</NavLink>
+              <Button
+                disabled={!email || !password || disable}
+                isProcessing={disable}
+                onClick={() => {
+                  if (email && password) {
+                    handleLogin(email, password);
+                  } else {
+                    console.warn("Email or password is missing.");
+                  }
+                }}
+              >
+                Log in to your account
               </Button>
             </div>
+
             <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
-              Not registered?&nbsp;
-              <a
-                href="#"
+              Not registered?{" "}
+              <NavLink
+                to="/create-account"
                 className="text-cyan-700 hover:underline dark:text-cyan-500"
               >
-                <NavLink to="/create-account">Create account</NavLink>
-              </a>
+                Create account
+              </NavLink>
             </div>
           </form>
         </div>

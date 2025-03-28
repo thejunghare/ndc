@@ -51,7 +51,7 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      <Header />
+      {/* <Header /> */}
       <div className="container mx-auto">
         <p className="font-semibold text-center text-sm p-2">Welcome Paddy! (RA)</p>
       </div>

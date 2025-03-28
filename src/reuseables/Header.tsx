@@ -1,10 +1,8 @@
-"use client";
-
 import { Button, Navbar } from "flowbite-react";
-
-const Header = () => {
-  return (
-    <Navbar fluid rounded className="bg-white shadow-md dark:bg-gray-800">  
+// {onLogout && <Button onClick={onLogout}>Logout</Button>}
+const Header = ({ onLogout }: { onLogout?: () => void }) => (
+  <div>
+<Navbar fluid rounded className="bg-white shadow-md dark:bg-gray-800">  
       <Navbar.Brand href="">
         <img
           src="/ISU_LOGO.webp"
@@ -16,7 +14,7 @@ const Header = () => {
         </span> */}
       </Navbar.Brand>
       <div className="flex md:order-2">
-        <Button>Logout</Button>
+      {onLogout && <Button onClick={onLogout}>Logout</Button>}
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
@@ -26,7 +24,8 @@ const Header = () => {
         <Navbar.Link href="#">About</Navbar.Link>
       </Navbar.Collapse>
     </Navbar>
-  );
-};
+  </div>
+  
+);
 
 export default Header;

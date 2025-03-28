@@ -9,7 +9,7 @@ import {
   FileInput,
   Textarea,
   Progress,
-  Toast
+  Toast,
 } from "flowbite-react";
 import React, { useState, useEffect } from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
@@ -79,7 +79,7 @@ const DashboardView = () => {
 
   const handleSubmit = () => {
     console.log(formData);
-    setOpenModal(false)
+    setOpenModal(false);
     setShowSpinner(true);
 
     setTimeout(() => {
@@ -95,14 +95,14 @@ const DashboardView = () => {
 
   return (
     <div>
-      <Header />
+      {/* <Header /> */}
       <div className="flex h-screen items-center justify-center bg-gray-100">
-        <div className="flex space-x-4 relative">
+        <div className="relative flex space-x-4">
           {/* Fill NDC */}
           <div className="relative">
             <Button onClick={() => setOpenModal(true)}>Fill NDC Form</Button>
             {showSpinner && (
-              <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center z-10 bg-opacity-50 bg-gray-800">
+              <div className="absolute bottom-0 left-0 right-0 top-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-50">
                 <SpinnerComponent />
               </div>
             )}
@@ -142,12 +142,12 @@ const DashboardView = () => {
                       </div>
                       <FileInput
                         id="passport_photo"
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            passportPhoto: e.target.files[0],
-                          })
-                        }
+                        // onChange={(e) =>
+                        //   setFormData({
+                        //     ...formData,
+                        //     passportPhoto: e.target.files[0],
+                        //   })
+                        // }
                         required
                       />
                     </div>
@@ -306,7 +306,7 @@ const DashboardView = () => {
 
       {/* Toast Component */}
       {showToast && (
-        <div className="fixed top-0 right-0 mt-4 mr-4 z-50">
+        <div className="fixed right-0 top-0 z-50 mr-4 mt-4">
           <ToastComponent />
         </div>
       )}

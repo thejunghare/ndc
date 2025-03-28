@@ -1,8 +1,22 @@
 import { NavLink } from "react-router-dom";
 import { Button, Label, TextInput } from "flowbite-react";
 import Header from "../reuseables/Header";
+import { useState } from "react";
 
 const CreateAccountView = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [disable, setDisable] = useState<boolean>(false);
+
+  const handleCreateAccount = (
+    email: string,
+    password: string,
+    confirmPassword: string,
+  ) => {
+    console.log(email, password, confirmPassword);
+  };
+
   return (
     <div>
       <Header />
@@ -14,24 +28,47 @@ const CreateAccountView = () => {
               <div className="mb-2 block">
                 <Label htmlFor="email" value="Your email" />
               </div>
-              <TextInput id="email" placeholder="name@company.com" required />
+              <TextInput
+                id="email"
+                placeholder="name@company.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="email" value="Set Password" />
+                <Label htmlFor="password" value="Set Password" />
               </div>
-              <TextInput id="email" required />
+              <TextInput
+                id="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
 
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="email" value="Confirm Password" />
+                <Label htmlFor="confirm_password" value="Confirm Password" />
               </div>
-              <TextInput id="email" required />
+              <TextInput
+                id="confirm_password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
             </div>
 
-            <Button type="submit">Register</Button>
+            <Button
+              type="button"
+              onClick={() =>
+                handleCreateAccount(email, password, confirmPassword)
+              }
+            >
+              Register
+            </Button>
           </form>
 
           <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">

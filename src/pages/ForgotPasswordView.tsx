@@ -1,8 +1,15 @@
 import { NavLink } from "react-router-dom";
 import { TextInput, Button, Label } from "flowbite-react";
 import Header from "../reuseables/Header";
+import { useState } from "react";
 
 const ForgotPasswordView = () => {
+  const [email, setEmail] = useState<string>("");
+
+  const handleForgotPasswordSubmit = (email: string) => {
+    console.log(email);
+  };
+
   return (
     <div>
       <Header />
@@ -20,10 +27,17 @@ const ForgotPasswordView = () => {
                 type="email"
                 id="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <Button type="submit">Send Reset Link</Button>
+            <Button
+              type="button"
+              onClick={() => handleForgotPasswordSubmit(email)}
+            >
+              Send Reset Link
+            </Button>
           </form>
 
           <div className="mt-2 flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
