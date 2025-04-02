@@ -1,29 +1,30 @@
-import { NavLink, useNavigate } from "react-router-dom"; 
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Checkbox, Label, TextInput, Select } from "flowbite-react";
 import Header from "../reuseables/Header";
 import { useState } from "react";
 import { useUser } from "../lib/UserContext";
-import { ToastContainer, toast } from 'react-toastify'
+import { ToastContainer, toast } from "react-toastify";
 
 const LoginView = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [disable, setDisable] = useState<boolean>(false);
-  const [role, setRole] = useState<string>("Student"); 
+  const [role, setRole] = useState<string>("Student");
   const navigate = useNavigate();
-  const { login } = useUser();
-  const loginFailed = (err:string) => toast(`Login Failed! ${err}`);
-  const loginSuccess = () => toast("Welcome back!");
+  const { signIn } = useUser();
+  const loginFailed = (err: any) => toast(`Login Failed! ${err}`);
+  //const loginSuccess = () => toast("Welcome back!");
 
+
+  // TODO -> Fix toast not showing on wrong password or email
   const handleLogin = async (email: string, password: string) => {
     setDisable(true);
     try {
-      await login(email, password);
-      loginSuccess();
-      // Role-based redirection can be added here if needed
+      await signIn(email, password);
+      //loginSuccess();
       navigate(role === "Admin" ? "/admin-dashboard" : "/dashboard");
-    } catch (err) {
-      loginFailed(err.message);
+    } catch (err: any) {
+      loginFailed(err);
       console.error(err);
       setDisable(false);
     }
@@ -31,7 +32,7 @@ const LoginView = () => {
 
   return (
     <div>
-        <ToastContainer
+      <ToastContainer
         position="top-center"
         autoClose={5000}
         hideProgressBar={false}
@@ -43,7 +44,8 @@ const LoginView = () => {
         pauseOnHover
         theme="light"
         // transition={Slide}
-        />
+      />
+
       <Header />
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">

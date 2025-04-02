@@ -1,8 +1,8 @@
 import { Button, Navbar } from "flowbite-react";
-// {onLogout && <Button onClick={onLogout}>Logout</Button>}
+
 const Header = ({ onLogout }: { onLogout?: () => void }) => (
   <div>
-<Navbar fluid rounded className="bg-white shadow-md dark:bg-gray-800">  
+    <Navbar fluid rounded className="bg-white shadow-md dark:bg-gray-800">
       <Navbar.Brand href="">
         <img
           src="/ISU_LOGO.webp"
@@ -14,7 +14,7 @@ const Header = ({ onLogout }: { onLogout?: () => void }) => (
         </span> */}
       </Navbar.Brand>
       <div className="flex md:order-2">
-      {onLogout && <Button onClick={onLogout}>Logout</Button>}
+        {onLogout && <Button onClick={onLogout}>Logout</Button>}
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
@@ -25,7 +25,6 @@ const Header = ({ onLogout }: { onLogout?: () => void }) => (
       </Navbar.Collapse>
     </Navbar>
   </div>
-  
 );
 
 export default Header;

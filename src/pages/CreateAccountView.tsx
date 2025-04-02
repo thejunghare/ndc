@@ -1,24 +1,44 @@
-import { NavLink } from "react-router-dom";
 import { Button, Label, TextInput } from "flowbite-react";
 import Header from "../reuseables/Header";
 import { useState } from "react";
+import { useUser } from "../lib/UserContext";
+import { ToastContainer, toast } from "react-toastify";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const CreateAccountView = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [disable, setDisable] = useState<boolean>(false);
+  const { signUp } = useUser();
+  // const navigate = useNavigate();
+  const accountCreated = () => toast("Account created!");
+  const accountCreatedFailed = () => toast("Error while creating account!");
 
-  const handleCreateAccount = (
+  const handleCreateAccount = async (
     email: string,
-    password: string,
     confirmPassword: string,
   ) => {
-    console.log(email, password, confirmPassword);
+    setDisable(true);
+    if (password === confirmPassword) {
+      try {
+        await signUp(email, confirmPassword);
+        accountCreated();
+        // navigate("/");
+        alert("Please confirm your mail and login")
+      } catch (error) {
+        accountCreatedFailed();
+        setDisable(false);
+      }
+    }else {
+      alert('Password and Confirm password does not match!')
+    }
+  
   };
 
   return (
     <div>
+      <ToastContainer/>
       <Header />
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
@@ -64,7 +84,7 @@ const CreateAccountView = () => {
             <Button
               type="button"
               onClick={() =>
-                handleCreateAccount(email, password, confirmPassword)
+                handleCreateAccount(email, confirmPassword)
               }
             >
               Register

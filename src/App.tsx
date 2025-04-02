@@ -1,7 +1,13 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Spinner } from "flowbite-react";
 import { UserProvider, useUser } from "./lib/UserContext";
+import {FormProvider} from "./lib/ndcFormContext";
 import LoginView from "./pages/LoginView";
 import DashboardView from "./pages/DashboardView";
 import NotFoundView from "./pages/NotFoundView";
@@ -20,8 +26,7 @@ function AppContent() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Wait for UserContext to initialize
-    if (current !== null) {
+    if (current !== undefined) {
       setLoading(false);
     }
   }, [current]);
@@ -40,19 +45,21 @@ function AppContent() {
     <>
       {current && <Header onLogout={logout} />}
       <Routes>
-        <Route path="/" element={<LoginView />} />
-        {/* <Route index element={<Navigate to={current ? "/dashboard" : "/"} />} /> */}
+        <Route
+          path="/"
+          element={current ? <Navigate to="/dashboard" /> : <LoginView />}
+        />
         <Route
           path="/dashboard"
           element={<AuthenticatedRoute element={<DashboardView />} />}
         />
-        <Route path="*" element={<NotFoundView />} />
         <Route path="/forgot-password" element={<ForgotPasswordView />} />
         <Route path="/create-account" element={<CreateAccountView />} />
         <Route
           path="/admin-dashboard"
           element={<AuthenticatedRoute element={<AdminDashboard />} />}
         />
+        <Route path="*" element={<NotFoundView />} />
       </Routes>
     </>
   );
@@ -62,7 +69,9 @@ function App() {
   return (
     <Router>
       <UserProvider>
-        <AppContent />
+        <FormProvider>
+          <AppContent />
+        </FormProvider>
       </UserProvider>
     </Router>
   );

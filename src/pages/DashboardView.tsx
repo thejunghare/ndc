@@ -1,5 +1,5 @@
 "use client";
-import Header from "../reuseables/Header";
+
 import {
   Button,
   Modal,
@@ -9,17 +9,20 @@ import {
   FileInput,
   Textarea,
   Progress,
-  Toast,
 } from "flowbite-react";
-import React, { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
 import ToastComponent from "../reuseables/ToastComponent";
+import {useForm,} from '../lib/ndcFormContext';
+import {useUser} from '../lib/UserContext'
 
 const DashboardView = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [progress, setProgress] = useState(0);
-
+  const {current} = useUser();
+  const {formData, updateFormData, resetForm, submitForm, courses} = useForm();
+  //console.log('list of courses: ',courses);
   const handleTrackStatusSubmit = () => {
     let currentProgress = 0;
     const interval = setInterval(() => {
@@ -53,18 +56,6 @@ const DashboardView = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openStatusModal, setOpenStatusModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [formData, setFormData] = useState({
-    name: "",
-    passportPhoto: null,
-    course: "",
-    batch: "",
-    rollNo: "",
-    address: "",
-    mobile: "",
-    email: "",
-    date: "",
-    signature: "",
-  });
 
   const onCloseModal = () => setOpenModal(false);
   const onCloseStatusModal = () => setOpenStatusModal(false);
@@ -77,57 +68,69 @@ const DashboardView = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log(formData);
     setOpenModal(false);
     setShowSpinner(true);
 
-    setTimeout(() => {
+    try {
+        const {success, error} = await submitForm();
+
       setShowSpinner(false);
 
+      if (success) {
+        setShowToast(true);
+        resetForm();
+        setTimeout(() => setShowToast(false), 2000);
+      } else {
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2000);
+      }
+    } catch (error) {
+      setShowSpinner(false);
       setShowToast(true);
-
-      setTimeout(() => {
-        setShowToast(false);
-      }, 2000);
-    }, 2000);
+      setTimeout(() => setShowToast(false), 2000);
+    }
   };
 
   return (
     <div>
       {/* <Header /> */}
       <div className="flex h-screen items-center justify-center bg-gray-100">
+        <p>{current?.email}</p>
         <div className="relative flex space-x-4">
           {/* Fill NDC */}
           <div className="relative">
             <Button onClick={() => setOpenModal(true)}>Fill NDC Form</Button>
             {showSpinner && (
-              <div className="absolute bottom-0 left-0 right-0 top-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                <SpinnerComponent />
+              <div
+                className="absolute bottom-0 left-0 right-0 top-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                <SpinnerComponent/>
               </div>
             )}
           </div>
           <Modal show={openModal} size="xl" onClose={onCloseModal} popup>
-            <Modal.Header />
+            <Modal.Header/>
             <div className="p-4">
               {/* Modal content */}
               {currentPage === 1 && (
                 <div className="space-y-4">
-                  <h2 className="mb-4 border-b-2 border-gray-300 pb-2 text-center text-2xl font-extrabold text-gray-900 dark:text-white">
+                  <h2
+                    className="mb-4 border-b-2 border-gray-300 pb-2 text-center text-2xl font-extrabold text-gray-900 dark:text-white">
                     Part 1: Personal Details
                   </h2>
                   <div className="flex space-x-4">
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="name" value="Name of Student" />
+                        <Label htmlFor="name" value="Name of Student"/>
                       </div>
                       <TextInput
                         id="name"
                         placeholder="Enter Name"
                         type="text"
-                        value={formData.name}
+                        value={formData.studentName}
                         onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
+                          updateFormData({studentName: e.target.value})
                         }
                         required
                       />
@@ -142,12 +145,20 @@ const DashboardView = () => {
                       </div>
                       <FileInput
                         id="passport_photo"
-                        // onChange={(e) =>
-                        //   setFormData({
-                        //     ...formData,
-                        //     passportPhoto: e.target.files[0],
-                        //   })
-                        // }
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // Validate file size (e.g., max 2MB)
+                            if (file.size > 2 * 1024 * 1024) {
+                              alert('Please upload an image smaller than 2MB');
+                              return;
+                            }
+                            updateFormData({
+                              studentPassportSizePhoto: file
+                            });
+                          }
+                        }}
                         required
                       />
                     </div>
@@ -156,51 +167,67 @@ const DashboardView = () => {
                   <div className="flex space-x-4">
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="course" value="Course" />
+                        <Label htmlFor="course" value="Course"/>
                       </div>
-                      <Select id="course" required>
-                        <option>B.Tech CSE</option>
+                      <Select
+                        id="course"
+                        required
+                        value={formData.studentCourseName}
+                        onChange={(e) => updateFormData({studentCourseName: e.target.value})}
+                      >
+                        <option value="">Select a course</option>
+                        {courses.map((course) => (
+                          <option key={course.id} value={course.name}>
+                            {course.name}
+                          </option>
+                        ))}
                       </Select>
                     </div>
 
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="batch" value="Batch" />
+                        <Label htmlFor="batch" value="Batch"/>
                       </div>
-                      <TextInput
+                      <Select
                         id="batch"
-                        placeholder="Enter Batch"
-                        type="text"
-                        value={formData.batch}
-                        onChange={(e) =>
-                          setFormData({ ...formData, batch: e.target.value })
-                        }
                         required
-                      />
+                        value={formData.studentBatch}
+                        onChange={(e) => updateFormData({studentBatch: e.target.value})}
+                      >
+                        <option value="">Select batch</option>
+                        <option value="2021-2025">2021-2025</option>
+                        <option value="2022-2026">2022-2026</option>
+                        <option value="2023-2027">2023-2027</option>
+                        <option value="2024-2028">2024-2028</option>
+                      </Select>
                     </div>
                   </div>
 
                   <div className="flex space-x-4">
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="roll_no" value="Roll Number" />
+                        <Label htmlFor="roll_no" value="Roll Number"/>
                       </div>
                       <TextInput
                         id="roll_no"
                         placeholder="Enter Roll Number"
                         type="text"
+                        value={formData.studentRollNumber}
+                        onChange={(e) => updateFormData({studentRollNumber: e.target.value})}
                         required
                       />
                     </div>
 
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="Phone_number" value="Phone Number" />
+                        <Label htmlFor="Phone_number" value="Phone Number"/>
                       </div>
                       <TextInput
                         id="batch"
                         placeholder="Enter Phone Number"
                         type="text"
+                        value={formData.studentPhoneNumber}
+                        onChange={(e) => updateFormData({studentPhoneNumber: e.target.value})}
                         required
                       />
                     </div>
@@ -210,18 +237,21 @@ const DashboardView = () => {
 
               {currentPage === 2 && (
                 <div className="space-y-4">
-                  <h2 className="mb-4 border-b-2 border-gray-300 pb-2 text-center text-2xl font-extrabold text-gray-900 dark:text-white">
+                  <h2
+                    className="mb-4 border-b-2 border-gray-300 pb-2 text-center text-2xl font-extrabold text-gray-900 dark:text-white">
                     Part 2: Additional Details
                   </h2>
                   <div className="flex">
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="email" value="Your Email*" />
+                        <Label htmlFor="email" value="Your Email*"/>
                       </div>
                       <TextInput
                         id="address"
                         placeholder="Enter Email"
                         required
+                        value={formData.studentEmailAddress}
+                        onChange={(e) => updateFormData({studentEmailAddress: e.target.value})}
                         type="email"
                       />
                     </div>
@@ -230,11 +260,13 @@ const DashboardView = () => {
                   <div className="flex">
                     <div className="flex-1">
                       <div className="mb-2 block">
-                        <Label htmlFor="address" value="Your Address*" />
+                        <Label htmlFor="address" value="Your Address*"/>
                       </div>
                       <Textarea
                         id="address"
                         placeholder="Enter Address"
+                        value={formData.studentAddress}
+                        onChange={(e) => updateFormData({studentAddress: e.target.value})}
                         required
                       />
                     </div>
@@ -271,10 +303,10 @@ const DashboardView = () => {
             onClose={onCloseStatusModal}
             popup
           >
-            <Modal.Header />
+            <Modal.Header/>
             <div className="flex-1 p-3">
               <div className="mb-2 block">
-                <Label htmlFor="ticket_number" value="Your Ticket Number*" />
+                <Label htmlFor="ticket_number" value="Your Ticket Number*"/>
               </div>
               <TextInput
                 id="address"
@@ -307,7 +339,7 @@ const DashboardView = () => {
       {/* Toast Component */}
       {showToast && (
         <div className="fixed right-0 top-0 z-50 mr-4 mt-4">
-          <ToastComponent />
+          <ToastComponent/>
         </div>
       )}
     </div>
