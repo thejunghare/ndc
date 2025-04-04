@@ -21,7 +21,12 @@ const DashboardView = () => {
   const [showToast, setShowToast] = useState(false);
   const [progress, setProgress] = useState(0);
   const {current} = useUser();
-  const {formData, updateFormData, resetForm, submitForm, courses} = useForm();
+//  if (current){
+//    console.log(current);
+//  }else {
+//    console.log('not auth')
+//  }
+  const {formData, updateFormData, resetForm, submitForm, courses, listCourses} = useForm();
   //console.log('list of courses: ',courses);
   const handleTrackStatusSubmit = () => {
     let currentProgress = 0;
@@ -36,6 +41,15 @@ const DashboardView = () => {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+  const fetchData = async () => {
+    await listCourses();
+    };
+
+    fetchData();
+    //console.log('list ',courses)
+  }, []);
 
   useEffect(() => {
     if (isSubmitting) {
@@ -69,35 +83,38 @@ const DashboardView = () => {
   };
 
   const handleSubmit = async () => {
-    console.log(formData);
     setOpenModal(false);
     setShowSpinner(true);
 
     try {
-        const {success, error} = await submitForm();
+      const response = await submitForm();
 
       setShowSpinner(false);
 
-      if (success) {
+      if (response.success) {
+        alert("Form submitted successfully!");
         setShowToast(true);
         resetForm();
-        setTimeout(() => setShowToast(false), 2000);
       } else {
+        console.error("Submission error:", response.error);
+        alert("Form submission failed: " + response.error);
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 2000);
       }
     } catch (error) {
-      setShowSpinner(false);
-      setShowToast(true);
+      console.error("Unexpected error:", error);
+      alert("Unexpected error occurred while submitting form");
+    } finally {
       setTimeout(() => setShowToast(false), 2000);
     }
   };
+
+
 
   return (
     <div>
       {/* <Header /> */}
       <div className="flex h-screen items-center justify-center bg-gray-100">
-        <p>{current?.email}</p>
+        <p>{current?.email ? `${current.email} - ${current.id}` : "No User Found"}</p>
         <div className="relative flex space-x-4">
           {/* Fill NDC */}
           <div className="relative">
@@ -143,24 +160,24 @@ const DashboardView = () => {
                           value="Passport Size Photo"
                         />
                       </div>
-                      <FileInput
-                        id="passport_photo"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            // Validate file size (e.g., max 2MB)
-                            if (file.size > 2 * 1024 * 1024) {
-                              alert('Please upload an image smaller than 2MB');
-                              return;
-                            }
-                            updateFormData({
-                              studentPassportSizePhoto: file
-                            });
-                          }
-                        }}
-                        required
-                      />
+                      {/*<FileInput*/}
+                      {/*  id="passport_photo"*/}
+                      {/*  accept="image/*"*/}
+                      {/*  onChange={(e) => {*/}
+                      {/*    const file = e.target.files?.[0];*/}
+                      {/*    if (file) {*/}
+                      {/*      // Validate file size (e.g., max 2MB)*/}
+                      {/*      if (file.size > 2 * 1024 * 1024) {*/}
+                      {/*        alert('Please upload an image smaller than 2MB');*/}
+                      {/*        return;*/}
+                      {/*      }*/}
+                      {/*      updateFormData({*/}
+                      {/*        studentPassportSizePhoto: file*/}
+                      {/*      });*/}
+                      {/*    }*/}
+                      {/*  }}*/}
+                      {/*  required*/}
+                      {/*/>*/}
                     </div>
                   </div>
 
@@ -177,7 +194,7 @@ const DashboardView = () => {
                       >
                         <option value="">Select a course</option>
                         {courses.map((course) => (
-                          <option key={course.id} value={course.name}>
+                          <option key={course.id} value={course.id}>
                             {course.name}
                           </option>
                         ))}
@@ -195,10 +212,10 @@ const DashboardView = () => {
                         onChange={(e) => updateFormData({studentBatch: e.target.value})}
                       >
                         <option value="">Select batch</option>
-                        <option value="2021-2025">2021-2025</option>
-                        <option value="2022-2026">2022-2026</option>
-                        <option value="2023-2027">2023-2027</option>
-                        <option value="2024-2028">2024-2028</option>
+                        <option value="1">2021-2025</option>
+                        <option value="2">2022-2026</option>
+                        <option value="3">2023-2027</option>
+                        <option value="4">2024-2028</option>
                       </Select>
                     </div>
                   </div>

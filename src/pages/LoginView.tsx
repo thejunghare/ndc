@@ -4,6 +4,7 @@ import Header from "../reuseables/Header";
 import { useState } from "react";
 import { useUser } from "../lib/UserContext";
 import { ToastContainer, toast } from "react-toastify";
+import {supabase} from '../db/supabase';
 
 const LoginView = () => {
   const [email, setEmail] = useState<string>("");
@@ -20,15 +21,42 @@ const LoginView = () => {
   const handleLogin = async (email: string, password: string) => {
     setDisable(true);
     try {
-      await signIn(email, password);
-      //loginSuccess();
-      navigate(role === "Admin" ? "/admin-dashboard" : "/dashboard");
+      // 1. Sign in
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError || !authData.user) throw authError || new Error("Login failed");
+
+      const userId = authData.user.id; // user id from auth
+
+      // 2. Fetch profile with role ID
+      const { data: profile, error: profileError } = await supabase
+        .from("profile")
+        .select("role")
+        .eq("id", userId);
+
+if (profile.role){
+  console.log(profile.role)
+}
+      if (profileError || !profile) throw profileError || new Error("Profile not found");
+
+
+    if (profile[0].role === 2) {
+  navigate("/admin-dashboard");
+} else {
+  navigate("/dashboard");
+    }
+
     } catch (err: any) {
       loginFailed(err);
-      console.error(err);
+      console.error(err.message || err);
       setDisable(false);
     }
   };
+
+
 
   return (
     <div>

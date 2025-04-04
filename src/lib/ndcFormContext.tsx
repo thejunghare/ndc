@@ -83,63 +83,70 @@ export const FormProvider = ({children}: { children: React.ReactNode }) => {
 
   const submitForm = async () => {
     try {
-      // Generate a random ticket number
+      if (!current) throw new Error("User not authenticated");
+
       const ticketNumber = `NDC-${Math.floor(100000 + Math.random() * 900000)}`;
-
-      // Upload passport photo if exists
       let photoUrl = '';
-      if (formData.studentPassportSizePhoto) {
-        const fileExt = formData.studentPassportSizePhoto.name.split('.').pop();
-        const fileName = `${ticketNumber}.${fileExt}`;
-        const filePath = `user_${current?.id}/${fileName}`;
 
-        const {error: uploadError} = await supabase.storage
-          .from('ndcstudentpassortsizephoto')
-          .upload(filePath, formData.studentPassportSizePhoto);
+      // Upload passport photo
+//      if (formData.studentPassportSizePhoto) {
+//        const file = formData.studentPassportSizePhoto;
+//        const fileExt = file.name.split('.').pop();
+//        const fileName = `${ticketNumber}.${fileExt}`;
+//        const filePath = `user_${current?.id}/${fileName}`;
+//
+//        const { error: uploadError } = await supabase.storage
+//          .from("ndcstudentpassortsizephoto")
+//          .upload(filePath, file, {
+//            cacheControl: "3600",
+//            upsert: false,
+//          });
+//
+//        if (uploadError) throw uploadError;
+//
+//        // Get public URL
+//        const { data: urlData } = supabase.storage
+//          .from("ndcstudentpassortsizephoto")
+//          .getPublicUrl(filePath);
+//
+//        photoUrl = urlData.publicUrl;
+//      }
 
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const {data: {publicUrl}} = supabase.storage
-          .from('ndcstudentpassortsizephoto')
-          .getPublicUrl(filePath);
-
-        photoUrl = publicUrl;
-      }
 
       // Insert form data into Supabase
-      const {data, error} = await supabase
-        .from('ndc_applications')
-        .insert([{
-          student_name: formData.studentName,
-          passport_photo_url: photoUrl,
-          course: 1,
-          batch: 1,
-          roll_number: formData.studentRollNumber,
-          phone_number: formData.studentPhoneNumber,
-          email: formData.studentEmailAddress,
-          address: formData.studentAddress,
-          user_id: current?.id,
-          status: 'pending',
-          ticket_number: ticketNumber,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }])
-        .select();
+      const { error } = await supabase
+        .from("ndc_part_one")
+        .insert([
+          {
+            student_name: formData.studentName,
+//            passport_photo_url: photoUrl || null,
+            course: formData.studentCourseName,
+            batch: formData.studentBatch,
+            roll_number: formData.studentRollNumber,
+            phone_number: formData.studentPhoneNumber,
+            email: formData.studentEmailAddress,
+            address: formData.studentAddress,
+            user_id: current?.id,
+            status: "pending",
+        //    ticket_number: ticketNumber,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ]);
 
       if (error) throw error;
 
-      updateFormData({ticketNumber}); // Update form data with ticket number
-
-      return {success: true};
+      updateFormData({ ticketNumber });
+      return { success: true };
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error: error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   };
+
 
   return (
     <FormContext.Provider value={{formData, updateFormData, resetForm, submitForm, listCourses, courses}}>
