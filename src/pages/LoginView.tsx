@@ -21,40 +21,43 @@ const LoginView = () => {
   const handleLogin = async (email: string, password: string) => {
     setDisable(true);
     try {
-      // 1. Sign in
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
+  
       if (authError || !authData.user) throw authError || new Error("Login failed");
-
-      const userId = authData.user.id; // user id from auth
-
-      // 2. Fetch profile with role ID
-      const { data: profile, error: profileError } = await supabase
-        .from("profile")
+  
+      const userId = authData.user.id;
+  
+      // Fetch role from profile table using the userId
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile") // change to "profiles" if your table is named that
         .select("role")
-        .eq("id", userId);
+        .eq("user_id", userId);
+  
+      if (profileError) throw profileError;
+      if (!profileData || profileData.length === 0) throw new Error("Profile not found");
+      console.log("Full profile response:", profileData);
 
-if (profile.role){
-  console.log(profile.role)
-}
-      if (profileError || !profile) throw profileError || new Error("Profile not found");
-
-
-    if (profile[0].role === 2) {
-  navigate("/admin-dashboard");
-} else {
-  navigate("/dashboard");
-    }
-
+      const userRole = profileData[0].role;
+  
+      console.log("User role is:", userRole);
+  
+      // Check if role === 2
+      if (userRole === 2) {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+  
     } catch (err: any) {
-      loginFailed(err);
+      loginFailed(err.message || err);
       console.error(err.message || err);
       setDisable(false);
     }
   };
+  
 
 
 

@@ -16,6 +16,7 @@ import CreateAccountView from "./pages/CreateAccountView";
 import AdminDashboard from "./pages/AdminDashboard";
 import Header from "./reuseables/Header";
 
+
 const AuthenticatedRoute = ({ element }: { element: JSX.Element }) => {
   const { current } = useUser();
   return current ? element : <Navigate to="/" />;
