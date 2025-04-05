@@ -1,7 +1,6 @@
-import { supabase } from '../db/supabase' // adjust path if needed
+import { supabase } from '../db/supabase' 
 
 export const trackApprovalStatus = async (requestId: string) => {
-    // Get all admins
     const { data: admins, error: adminError } = await supabase
       .from("profile")
       .select("user_id")
@@ -12,7 +11,7 @@ export const trackApprovalStatus = async (requestId: string) => {
     // Get approvals for this request
     const { data: approvals, error: approvalError } = await supabase
       .from("ndc_approval")
-      .select("admin_id, status")
+      .select("admin_id, status, remarks")
       .eq("request_id", requestId);
   
     if (approvalError) return { success: false, error: approvalError.message };
