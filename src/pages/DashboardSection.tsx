@@ -28,7 +28,7 @@ import {
   HiInbox,
   HiOutlineAdjustments,
   HiUserCircle,
-  HiRefresh,
+  HiRefresh
 } from "react-icons/hi";
 import { supabase } from "../db/supabase";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
@@ -36,162 +36,162 @@ import MyRequest from "./MyRequests";
 import ProfileView from "./ProfileView";
 import SettingsView from "./SettingsView";
 
-const DashboardView = () => {
-  const [showSpinner, setShowSpinner] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const { current } = useUser();
-  //  if (current){
-  //    console.log(current);
-  //  }else {
-  //    console.log('not auth')
-  //  }
-  const {
-    formData,
-    updateFormData,
-    resetForm,
-    submitForm,
-    courses,
-    listCourses,
-  } = useForm();
-  //console.log('list of courses: ',courses);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await listCourses();
+const DashboardSection = () => {
+    const [showSpinner, setShowSpinner] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const { current } = useUser();
+    //  if (current){
+    //    console.log(current);
+    //  }else {
+    //    console.log('not auth')
+    //  }
+    const {
+      formData,
+      updateFormData,
+      resetForm,
+      submitForm,
+      courses,
+      listCourses,
+    } = useForm();
+    //console.log('list of courses: ',courses);
+  
+    const [isSubmitting, setIsSubmitting] = useState(false);
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        await listCourses();
+      };
+  
+      fetchData();
+      //console.log('list ',courses)
+    }, []);
+  
+    useEffect(() => {
+      if (isSubmitting) {
+        let currentProgress = 0;
+        const interval = setInterval(() => {
+          if (currentProgress >= 50) {
+            clearInterval(interval);
+          } else {
+            currentProgress += 1;
+            setProgress(currentProgress);
+          }
+        }, 20);
+  
+        return () => clearInterval(interval);
+      }
+    }, [isSubmitting]);
+  
+    const [openModal, setOpenModal] = useState(false);
+    const [openStatusModal, setOpenStatusModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+  
+    const onCloseModal = () => setOpenModal(false);
+    const onCloseStatusModal = () => setOpenStatusModal(false);
+  
+    const handleNextPage = () => {
+      if (currentPage < 2) setCurrentPage(currentPage + 1);
     };
-
-    fetchData();
-    //console.log('list ',courses)
-  }, []);
-
-  useEffect(() => {
-    if (isSubmitting) {
-      let currentProgress = 0;
-      const interval = setInterval(() => {
-        if (currentProgress >= 50) {
-          clearInterval(interval);
+  
+    const handlePrevPage = () => {
+      if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+  
+    const handleSubmit = async () => {
+      setOpenModal(false);
+      setShowSpinner(true);
+  
+      try {
+        const response = await submitForm();
+  
+        setShowSpinner(false);
+  
+        if (response.success) {
+          alert("Form submitted successfully!");
+          setShowToast(true);
+          updateFormData({ id: response.requestId }); // 🔥 Save requestId here
+          resetForm();
         } else {
-          currentProgress += 1;
-          setProgress(currentProgress);
+          console.error("Submission error:", response.error);
+          alert("Form submission failed: " + response.error);
+          setShowToast(true);
         }
-      }, 20);
-
-      return () => clearInterval(interval);
-    }
-  }, [isSubmitting]);
-
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [openStatusModal, setOpenStatusModal] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const onCloseModal = () => setOpenModal(false);
-  const onCloseStatusModal = () => setOpenStatusModal(false);
-
-  const handleNextPage = () => {
-    if (currentPage < 2) setCurrentPage(currentPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleSubmit = async () => {
-    setOpenModal(false);
-    setShowSpinner(true);
-
-    try {
-      const response = await submitForm();
-
-      setShowSpinner(false);
-
-      if (response.success) {
-        alert("Form submitted successfully!");
-        setShowToast(true);
-        updateFormData({ id: response.requestId }); // 🔥 Save requestId here
-        resetForm();
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        alert("Unexpected error occurred while submitting form");
+      } finally {
+        setTimeout(() => setShowToast(false), 2000);
+      }
+    };
+  
+    const [ticketNumberInput, setTicketNumberInput] = useState("");
+    const [approvalStatusList, setApprovalStatusList] = useState([]);
+    const [trackError, setTrackError] = useState("");
+  
+    const handleTrackStatusSubmit = async () => {
+      const requestId = ticketNumberInput.trim();
+      if (!requestId) return alert("Please enter a ticket number");
+  
+      const result = await trackApprovalStatus(requestId);
+  
+      if (result.success) {
+        setProgress(result.progressPercent);
+        setApprovalStatusList(result.statusList);
+        setTrackError("");
       } else {
-        console.error("Submission error:", response.error);
-        alert("Form submission failed: " + response.error);
-        setShowToast(true);
+        setTrackError(result.error || "Error fetching status");
+        setApprovalStatusList([]);
+        setProgress(0);
       }
-    } catch (error) {
-      console.error("Unexpected error:", error);
-      alert("Unexpected error occurred while submitting form");
-    } finally {
-      setTimeout(() => setShowToast(false), 2000);
-    }
-  };
-
-  const [ticketNumberInput, setTicketNumberInput] = useState("");
-  const [approvalStatusList, setApprovalStatusList] = useState([]);
-  const [trackError, setTrackError] = useState("");
-
-  const handleTrackStatusSubmit = async () => {
-    const requestId = ticketNumberInput.trim();
-    if (!requestId) return alert("Please enter a ticket number");
-
-    const result = await trackApprovalStatus(requestId);
-
-    if (result.success) {
-      setProgress(result.progressPercent);
-      setApprovalStatusList(result.statusList);
-      setTrackError("");
-    } else {
-      setTrackError(result.error || "Error fetching status");
-      setApprovalStatusList([]);
-      setProgress(0);
-    }
-  };
-
-  const handleReviewRequest = async (requestId: string) => {
-    try {
-      if (!requestId || typeof requestId !== "string") {
-        alert("Invalid request ID");
-        return;
+    };
+  
+    const handleReviewRequest = async (requestId: string) => {
+      try {
+        if (!requestId || typeof requestId !== 'string') {
+          alert("Invalid request ID");
+          return;
+        }
+    
+        const { error: resetError } = await supabase
+          .from("ndc_approval")
+          .update({ 
+            status: "pending",
+            review_requested: true,
+            decision: null,
+            remarks: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq("request_id", requestId);
+    
+        if (resetError) throw resetError;
+    
+        // Update main request using existing columns
+        const { error: requestError } = await supabase
+          .from("ndc_part_one")
+          .update({
+            status: "under_review",
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", requestId);
+    
+        if (requestError) throw requestError;
+    
+        alert("Review request sent successfully!");
+        handleTrackStatusSubmit();
+      } catch (err) {
+        console.error("Review request error:", err);
+        alert(`Failed to request review: ${err.message}`);
       }
-
-      const { error: resetError } = await supabase
-        .from("ndc_approval")
-        .update({
-          status: "pending",
-          review_requested: true,
-          decision: null,
-          remarks: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("request_id", requestId);
-
-      if (resetError) throw resetError;
-
-      // Update main request using existing columns
-      const { error: requestError } = await supabase
-        .from("ndc_part_one")
-        .update({
-          status: "under_review",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", requestId);
-
-      if (requestError) throw requestError;
-
-      alert("Review request sent successfully!");
-      handleTrackStatusSubmit();
-    } catch (err) {
-      console.error("Review request error:", err);
-      alert(`Failed to request review: ${err.message}`);
-    }
-  };
-
-  <Button onClick={() => handleReviewRequest(selectedRequest.id)}>
-    Request Re-Review
-  </Button>;
-
-  const DashboardSection = () => (
+    };
+  
+    <Button onClick={() => handleReviewRequest(selectedRequest.id)}>
+      Request Re-Review
+    </Button>;
+    
+  return (
     <div className="flex h-screen items-center justify-center bg-gray-100">
-      {/* <div className="text-xl font-bold">Welcome </div> */}
+      <div className="text-xl font-bold">Welcome </div>
       {/*<p>*/}
       {/*  {current?.email*/}
       {/*    ? `${current.email} - ${current.id}`*/}
@@ -268,18 +268,18 @@ const DashboardView = () => {
                       <Label htmlFor="course" value="Course" />
                     </div>
                     {/*   <Select
-                      id="course"
-                      required
-                      value={formData.studentCourseName}
-                      onChange={(e) => updateFormData({studentCourseName: e.target.value})}
-                    >
-                      <option value="">Select a course</option>
-                      {courses.map((course) => (
-                        <option key={course.id} value={course.id}>
-                          {course.name}
-                        </option>
-                      ))}
-                    </Select> */}
+                        id="course"
+                        required
+                        value={formData.studentCourseName}
+                        onChange={(e) => updateFormData({studentCourseName: e.target.value})}
+                      >
+                        <option value="">Select a course</option>
+                        {courses.map((course) => (
+                          <option key={course.id} value={course.id}>
+                            {course.name}
+                          </option>
+                        ))}
+                      </Select> */}
 
                     <TextInput
                       id="name"
@@ -297,17 +297,17 @@ const DashboardView = () => {
                       <Label htmlFor="batch" value="Batch" />
                     </div>
                     {/*   <Select
-                      id="batch"
-                      required
-                      value={formData.studentBatch}
-                      onChange={(e) => updateFormData({studentBatch: e.target.value})}
-                    >
-                      <option value="">Select batch</option>
-                      <option value="1">2021-2025</option>
-                      <option value="2">2022-2026</option>
-                      <option value="3">2023-2027</option>
-                      <option value="4">2024-2028</option>
-                    </Select> */}
+                        id="batch"
+                        required
+                        value={formData.studentBatch}
+                        onChange={(e) => updateFormData({studentBatch: e.target.value})}
+                      >
+                        <option value="">Select batch</option>
+                        <option value="1">2021-2025</option>
+                        <option value="2">2022-2026</option>
+                        <option value="3">2023-2027</option>
+                        <option value="4">2024-2028</option>
+                      </Select> */}
                     <TextInput
                       id="name"
                       placeholder="Enter Name"
@@ -572,108 +572,6 @@ const DashboardView = () => {
       </div>
     </div>
   );
-
-  const [selectedSection, setSelectedSection] = useState("profile");
-
-  const renderSection = () => {
-    switch (selectedSection) {
-      case "profile":
-        return <ProfileView />;
-      case "dashboard":
-        return <DashboardSection />;
-      case "requests":
-        return <MyRequest currentUserId={current?.id} />;
-      case "settings":
-        return <SettingsView />;
-      default:
-        return <DashboardSection />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex h-full">
-        <div
-          className="group fixed z-50 flex h-screen w-16 flex-col overflow-hidden bg-white 
-                  shadow-md transition-all duration-300 ease-in-out 
-                  hover:w-48 md:w-64 md:hover:w-64"
-        >
-          <div className="flex-1 overflow-y-auto">
-            {" "}
-            {/* Added vertical scroll */}
-            <Sidebar aria-label="Sidebar" className="h-full">
-              <SidebarItems>
-                <SidebarItemGroup>
-                  {[
-                    { key: "profile", icon: HiUserCircle, label: "Profile" },
-                    {
-                      key: "dashboard",
-                      icon: HiCloudDownload,
-                      label: "Dashboard",
-                    },
-                    { key: "requests", icon: HiInbox, label: "My Requests" },
-                    {
-                      key: "settings",
-                      icon: HiOutlineAdjustments,
-                      label: "Settings",
-                    },
-                  ].map(({ key, icon, label }) => (
-                    <SidebarItem
-                      key={key}
-                      icon={icon}
-                      active={selectedSection === key}
-                      onClick={() => setSelectedSection(key)}
-                      className="whitespace-nowrap px-4 transition-all duration-200"
-                    >
-                      <span className="hidden overflow-hidden truncate group-hover:inline-block md:inline-block">
-                        {label}
-                      </span>
-                    </SidebarItem>
-                  ))}
-                </SidebarItemGroup>
-              </SidebarItems>
-
-              {/* CTA Section */}
-              <SidebarItemGroup className="mt-4 border-t pt-4">
-                <SidebarCTA className="px-4">
-                  <div className="mb-3 flex items-center">
-                    <Badge color="warning">Beta</Badge>
-                    <button
-                      aria-label="Close"
-                      className="-m-1.5 ml-auto hidden h-6 w-6 rounded-lg bg-gray-100 p-1 text-cyan-900 hover:bg-gray-200 md:inline-flex"
-                    >
-                      {/* SVG icon */}
-                    </button>
-                  </div>
-                  <div className="mb-3 hidden truncate text-sm text-cyan-900 group-hover:block md:block">
-                    Preview the new NDC dashboard! Found a bug? Report it.
-                  </div>
-                  <a
-                    className="hidden truncate text-sm text-cyan-900 underline hover:text-cyan-800 group-hover:block md:block"
-                    href="#"
-                  >
-                    Feedback Form
-                  </a>
-                </SidebarCTA>
-              </SidebarItemGroup>
-            </Sidebar>
-          </div>
-        </div>
-
-        {/* Main Content - Prevent overflow */}
-        <div className="ml-16 w-[calc(100%-4rem)] p-4 sm:p-6 md:ml-64 md:w-[calc(100%-16rem)]">
-          {renderSection()}
-        </div>
-
-        {/* Toast Component */}
-        {showToast && (
-          <div className="fixed right-0 top-0 z-50 mr-4 mt-4">
-            <ToastComponent />
-          </div>
-        )}
-      </div>
-    </div>
-  );
 };
 
-export default DashboardView;
+export default DashboardSection;

@@ -109,7 +109,6 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   
       const ndcRequestId = insertResult.id;
   
-      // ✅ Step 2: Fetch admins by role and select user_id
       const { data: adminsRaw, error: adminFetchError } = await supabase
         .from("profile")
         .select("user_id")
@@ -125,7 +124,6 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error("No valid admins found for approvals.");
       }
   
-      // Step 3: Create approval entries with correct admin_id = user_id
       const approvalEntries = validAdmins.map((admin) => ({
         request_id: ndcRequestId,
         admin_id: admin.user_id,
