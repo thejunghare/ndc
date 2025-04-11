@@ -23,12 +23,29 @@ interface Course {
   name: string;
 }
 
+interface ndcTickets {
+  id: number;
+  ticket_number: string;
+  student_name: string;
+  course: string;
+  batch: string;  
+  roll_number: string;
+  phone_number: string;
+  email: string;
+  address: string;
+  user_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface FormContextType {
   formData: PersonalDetailsFormData;
   updateFormData: (newData: Partial<PersonalDetailsFormData>) => void;
   resetForm: () => void;
   submitForm: () => Promise<{ success: boolean; error?: string }>;
   listCourses: () => Promise<void>;
+  listTickets: () => Promise<void>;
   courses: Course[];
 }
 
@@ -37,6 +54,7 @@ const FormContext = createContext<FormContextType | undefined>(undefined);
 export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   const { current } = useUser();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [ndcTickets, setNdcTickets] = useState<ndcTickets[]>([]);
   //console.log(course);
   const [formData, setFormData] = useState<PersonalDetailsFormData>({
     studentName: "",
@@ -76,6 +94,18 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setCourses(data);
     }
+  };
+
+  const listTickets = async () => {
+    const { data, error } = await supabase.from("ndc_part_one").select();
+
+    if (error) {
+      console.log(error);
+    } else {
+      setNdcTickets(data);
+    }
+
+    return ndcTickets;
   };
 
   const submitForm = async () => {
@@ -161,6 +191,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         resetForm,
         submitForm,
         listCourses,
+        listTickets,
         courses,
       }}
     >

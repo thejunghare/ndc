@@ -15,6 +15,7 @@ import ForgotPasswordView from "./pages/ForgotPasswordView";
 import CreateAccountView from "./pages/CreateAccountView";
 import AdminDashboard from "./pages/AdminDashboard";
 import Header from "./reuseables/Header";
+import SuperADminDashboard from "./pages/SuperAdminDashboard";
 
 
 const AuthenticatedRoute = ({ element }: { element: JSX.Element }) => {
@@ -53,6 +54,10 @@ function AppContent() {
         <Route
           path="/dashboard"
           element={<AuthenticatedRoute element={<DashboardView />} />}
+        />
+         <Route
+          path="/super-dashboard"
+          element={<AuthenticatedRoute element={<SuperADminDashboard />} />}
         />
         <Route path="/forgot-password" element={<ForgotPasswordView />} />
         <Route path="/create-account" element={<CreateAccountView />} />

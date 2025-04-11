@@ -47,7 +47,9 @@ const LoginView = () => {
       // Check if role === 2
       if (userRole === 2) {
         navigate("/admin-dashboard");
-      } else {
+      } else if (userRole === 3) {
+        navigate("/super-dashboard");
+      }else {
         navigate("/dashboard");
       }
   
@@ -82,7 +84,7 @@ const LoginView = () => {
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
           <h2 className="text-center text-2xl font-semibold">Login</h2>
           <form className="mt-4 space-y-4">
-            <div>
+            {/* <div>
               <div className="mb-2 block">
                 <Label htmlFor="select" value="Select your role" />
               </div>
@@ -95,7 +97,7 @@ const LoginView = () => {
                 <option>Student</option>
                 <option>Admin</option>
               </Select>
-            </div>
+            </div> */}
 
             <div>
               <div className="mb-2 block">

@@ -191,7 +191,7 @@ const DashboardView = () => {
 
   const DashboardSection = () => (
     <div className="flex h-screen items-center justify-center bg-gray-100">
-      {/* <div className="text-xl font-bold">Welcome </div> */}
+      {/* <div className="text-xl font-bold">Welcome {current?.email}</div> */}
       {/*<p>*/}
       {/*  {current?.email*/}
       {/*    ? `${current.email} - ${current.id}`*/}
@@ -577,10 +577,10 @@ const DashboardView = () => {
 
   const renderSection = () => {
     switch (selectedSection) {
-      case "profile":
-        return <ProfileView />;
       case "dashboard":
         return <DashboardSection />;
+        case "profile":
+          return <ProfileView />;
       case "requests":
         return <MyRequest currentUserId={current?.id} />;
       case "settings":
@@ -605,12 +605,12 @@ const DashboardView = () => {
               <SidebarItems>
                 <SidebarItemGroup>
                   {[
-                    { key: "profile", icon: HiUserCircle, label: "Profile" },
                     {
                       key: "dashboard",
                       icon: HiCloudDownload,
                       label: "Dashboard",
                     },
+                    { key: "profile", icon: HiUserCircle, label: "Profile" },
                     { key: "requests", icon: HiInbox, label: "My Requests" },
                     {
                       key: "settings",

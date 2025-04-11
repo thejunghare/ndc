@@ -18,7 +18,7 @@ import {
   SidebarItemGroup,
   SidebarItems,
 } from "flowbite-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
 import ToastComponent from "../reuseables/ToastComponent";
 import { useForm } from "../lib/ndcFormContext";
@@ -41,6 +41,7 @@ const DashboardSection = () => {
     const [showToast, setShowToast] = useState(false);
     const [progress, setProgress] = useState(0);
     const { current } = useUser();
+    const inputRef = useRef(null)
     //  if (current){
     //    console.log(current);
     //  }else {
@@ -191,7 +192,6 @@ const DashboardSection = () => {
     
   return (
     <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="text-xl font-bold">Welcome </div>
       {/*<p>*/}
       {/*  {current?.email*/}
       {/*    ? `${current.email} - ${current.id}`*/}
@@ -199,6 +199,7 @@ const DashboardSection = () => {
       {/*</p>*/}
 
       <div className="relative flex space-x-4">
+      <div className="text-xl font-bold">Welcome {current?.email} </div>
         {/* Fill NDC */}
         <div className="relative">
           <Button onClick={() => setOpenModal(true)}>Fill NDC Form</Button>
@@ -439,6 +440,7 @@ const DashboardSection = () => {
                 onChange={(e) => setTicketNumberInput(e.target.value)}
                 className="mb-4"
                 placeholder="Enter request ID"
+                ref={inputRef}
               />
             </div>
 
