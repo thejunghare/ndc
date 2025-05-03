@@ -17,6 +17,7 @@ import {
   SidebarItem,
   SidebarItemGroup,
   SidebarItems,
+  Spinner,
 } from "flowbite-react";
 import { useState, useEffect } from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
@@ -29,6 +30,7 @@ import {
   HiOutlineAdjustments,
   HiUserCircle,
   HiRefresh,
+  HiCheck,
 } from "react-icons/hi";
 import { supabase } from "../db/supabase";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
@@ -36,16 +38,50 @@ import MyRequest from "./MyRequests";
 import ProfileView from "./ProfileView";
 import SettingsView from "./SettingsView";
 
+interface ApprovalStatus {
+  admin_id: string;
+  profile: {
+    name: string;
+  };
+  status: string;
+  remarks: string;
+  review_requested: boolean;
+}
+
 const DashboardView = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [progress, setProgress] = useState(0);
   const { current } = useUser();
-  //  if (current){
-  //    console.log(current);
-  //  }else {
-  //    console.log('not auth')
-  //  }
+  const [userProfile, setUserProfile] = useState<{ username: string; designation: string } | null>(null);
+
+  // Fetch user profile info
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!current?.id) return;
+      
+      const { data, error } = await supabase
+        .from('profile')
+        .select('username, designation')
+        .eq('user_id', current.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return;
+      }
+
+      if (data) {
+        setUserProfile({
+          username: data.username || 'User',
+          designation: data.designation || 'No designation'
+        });
+      }
+    };
+
+    fetchUserProfile();
+  }, [current?.id]);
+
   const {
     formData,
     updateFormData,
@@ -126,33 +162,43 @@ const DashboardView = () => {
   };
 
   const [ticketNumberInput, setTicketNumberInput] = useState("");
-  const [approvalStatusList, setApprovalStatusList] = useState([]);
+  const [approvalStatusList, setApprovalStatusList] = useState<
+    ApprovalStatus[]
+  >([]);
   const [trackError, setTrackError] = useState("");
 
   const handleTrackStatusSubmit = async () => {
     const requestId = ticketNumberInput.trim();
     if (!requestId) return alert("Please enter a ticket number");
 
-    const result = await trackApprovalStatus(requestId);
+    try {
+      const result = await trackApprovalStatus(requestId);
 
-    if (result.success) {
-      setProgress(result.progressPercent);
-      setApprovalStatusList(result.statusList);
-      setTrackError("");
-    } else {
-      setTrackError(result.error || "Error fetching status");
+      if (result.success) {
+        setProgress(result.progressPercent || 0);
+        setApprovalStatusList(result.statusList || []);
+        setTrackError("");
+      } else {
+        setTrackError(result.error || "Error fetching status");
+        setApprovalStatusList([]);
+        setProgress(0);
+      }
+    } catch (err: any) {
+      console.error("Error in handleTrackStatusSubmit:", err);
+      setTrackError(err.message || "Error fetching status");
       setApprovalStatusList([]);
       setProgress(0);
     }
   };
 
-  const handleReviewRequest = async (requestId: string) => {
+  const handleReviewRequest = async (requestId: string, adminId: string) => {
     try {
       if (!requestId || typeof requestId !== "string") {
         alert("Invalid request ID");
         return;
       }
 
+      // Update only the specific admin's approval record
       const { error: resetError } = await supabase
         .from("ndc_approval")
         .update({
@@ -162,11 +208,12 @@ const DashboardView = () => {
           remarks: null,
           updated_at: new Date().toISOString(),
         })
-        .eq("request_id", requestId);
+        .eq("request_id", requestId)
+        .eq("admin_id", adminId);
 
       if (resetError) throw resetError;
 
-      // Update main request using existing columns
+      // Update main request status to under_review
       const { error: requestError } = await supabase
         .from("ndc_part_one")
         .update({
@@ -179,7 +226,7 @@ const DashboardView = () => {
 
       alert("Review request sent successfully!");
       handleTrackStatusSubmit();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Review request error:", err);
       alert(`Failed to request review: ${err.message}`);
     }
@@ -439,6 +486,7 @@ const DashboardView = () => {
                 onChange={(e) => setTicketNumberInput(e.target.value)}
                 className="mb-4"
                 placeholder="Enter request ID"
+                autoFocus
               />
             </div>
 
@@ -490,7 +538,7 @@ const DashboardView = () => {
                         ? "green"
                         : "blue"
                   }
-                  labelPosition="inside"
+                  textLabelPosition="inside"
                   textLabel={`${progress}% complete`}
                 />
 
@@ -503,13 +551,13 @@ const DashboardView = () => {
                     >
                       <div className="min-w-0 flex-1">
                         <span className="block truncate font-medium">
-                          {status.profile?.designation || `Admin ${index + 1}`}
+                          {status.profile?.name || `Admin ${index + 1}`}
                         </span>
 
                         {status.status === "rejected" && (
                           <div className="mt-1 truncate text-sm text-red-700">
                             <strong>Remark:</strong>{" "}
-                            {status?.remarks || `Error Something went wrong!!`}
+                            {status?.remarks || "No remarks provided"}
                           </div>
                         )}
                       </div>
@@ -531,9 +579,7 @@ const DashboardView = () => {
                           <Button
                             size="xs"
                             color="warning"
-                            onClick={() =>
-                              handleReviewRequest(ticketNumberInput)
-                            }
+                            onClick={() => handleReviewRequest(ticketNumberInput, status.admin_id)}
                             disabled={status.review_requested}
                           >
                             {status.review_requested ? (
@@ -573,16 +619,16 @@ const DashboardView = () => {
     </div>
   );
 
-  const [selectedSection, setSelectedSection] = useState("profile");
+  const [selectedSection, setSelectedSection] = useState("dashboard");
 
   const renderSection = () => {
     switch (selectedSection) {
       case "dashboard":
         return <DashboardSection />;
-        case "profile":
-          return <ProfileView />;
+      case "profile":
+        return <ProfileView />;
       case "requests":
-        return <MyRequest currentUserId={current?.id} />;
+        return <MyRequest currentUserId={current?.id || ""} />;
       case "settings":
         return <SettingsView />;
       default:
@@ -604,6 +650,21 @@ const DashboardView = () => {
             <Sidebar aria-label="Sidebar" className="h-full">
               <SidebarItems>
                 <SidebarItemGroup>
+                  <div className="mb-4 p-4">
+                    <p className="text-sm font-semibold text-gray-700">
+                      {userProfile ? (
+                        <>
+                          Welcome, {userProfile.username}
+                          <br />
+                          <span className="text-xs text-gray-500">
+                            {userProfile.designation}
+                          </span>
+                        </>
+                      ) : (
+                        <Spinner size="sm" />
+                      )}
+                    </p>
+                  </div>
                   {[
                     {
                       key: "dashboard",

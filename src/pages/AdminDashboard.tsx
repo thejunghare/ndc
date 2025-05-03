@@ -17,6 +17,8 @@ const AdminDashboard = () => {
   const fetchRequests = async () => {
     if (!current) return;
     setLoading(true);
+
+     
   
     // 1. Get pending approvals for current admin
     const { data: approvals, error } = await supabase
@@ -92,7 +94,7 @@ const AdminDashboard = () => {
   return (
     <div className="container mx-auto p-4">
       <p className="font-semibold text-center text-sm p-2">
-        Welcome {current?.username}! (Admin)
+        Welcome {current?.username}
       </p>
 
       <h2 className="text-2xl font-semibold mb-4">NDC Requests</h2>
