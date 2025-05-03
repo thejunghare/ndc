@@ -7,7 +7,7 @@ import {
 import { useState, useEffect } from "react";
 import { Spinner } from "flowbite-react";
 import { UserProvider, useUser } from "./lib/UserContext";
-import {FormProvider} from "./lib/ndcFormContext";
+import { FormProvider } from "./lib/ndcFormContext";
 import LoginView from "./pages/LoginView";
 import DashboardView from "./pages/DashboardView";
 import NotFoundView from "./pages/NotFoundView";
@@ -15,13 +15,8 @@ import ForgotPasswordView from "./pages/ForgotPasswordView";
 import CreateAccountView from "./pages/CreateAccountView";
 import AdminDashboard from "./pages/AdminDashboard";
 import Header from "./reuseables/Header";
-import SuperADminDashboard from "./pages/SuperAdminDashboard";
-
-
-const AuthenticatedRoute = ({ element }: { element: JSX.Element }) => {
-  const { current } = useUser();
-  return current ? element : <Navigate to="/" />;
-};
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import RoleProtectedRoute from "./lib/RoleProtectedRoute";
 
 function AppContent() {
   const { current, logout } = useUser();
@@ -53,18 +48,30 @@ function AppContent() {
         />
         <Route
           path="/dashboard"
-          element={<AuthenticatedRoute element={<DashboardView />} />}
+          element={
+            <RoleProtectedRoute allowedRoles={[1]}>
+              <DashboardView />
+            </RoleProtectedRoute>
+          }
         />
-         <Route
+        <Route
           path="/super-dashboard"
-          element={<AuthenticatedRoute element={<SuperADminDashboard />} />}
+          element={
+            <RoleProtectedRoute allowedRoles={[3]}>
+              <SuperAdminDashboard />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <RoleProtectedRoute allowedRoles={[2]}>
+              <AdminDashboard />
+            </RoleProtectedRoute>
+          }
         />
         <Route path="/forgot-password" element={<ForgotPasswordView />} />
         <Route path="/create-account" element={<CreateAccountView />} />
-        <Route
-          path="/admin-dashboard"
-          element={<AuthenticatedRoute element={<AdminDashboard />} />}
-        />
         <Route path="*" element={<NotFoundView />} />
       </Routes>
     </>
