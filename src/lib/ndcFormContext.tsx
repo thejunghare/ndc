@@ -28,7 +28,7 @@ interface ndcTickets {
   ticket_number: string;
   student_name: string;
   course: string;
-  batch: string;  
+  batch: string;
   roll_number: string;
   phone_number: string;
   email: string;
@@ -111,10 +111,9 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   const submitForm = async () => {
     try {
       if (!current) throw new Error("User not authenticated");
-  
+
       const ticketNumber = `NDC-${Math.floor(100000 + Math.random() * 900000)}`;
-  
-      // Step 1: Insert form data
+
       const { data: insertResult, error: insertError } = await supabase
         .from("ndc_part_one")
         .insert([
@@ -134,26 +133,27 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         ])
         .select("id")
         .single();
-  
+
       if (insertError) throw insertError;
-  
+
       const ndcRequestId = insertResult.id;
-  
+
       const { data: adminsRaw, error: adminFetchError } = await supabase
         .from("profile")
         .select("user_id")
         .eq("role", 2);
-  
+
       if (adminFetchError) throw adminFetchError;
-  
+
       const validAdmins = (adminsRaw || []).filter(
-        (admin) => typeof admin.user_id === "string" && admin.user_id.length > 0
+        (admin) =>
+          typeof admin.user_id === "string" && admin.user_id.length > 0,
       );
-  
+
       if (validAdmins.length === 0) {
         throw new Error("No valid admins found for approvals.");
       }
-  
+
       const approvalEntries = validAdmins.map((admin) => ({
         request_id: ndcRequestId,
         admin_id: admin.user_id,
@@ -161,27 +161,25 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }));
-  
+
       const { error: approvalInsertError } = await supabase
         .from("ndc_approval")
         .insert(approvalEntries);
-  
+
       if (approvalInsertError) throw approvalInsertError;
-  
+
       updateFormData({ ticketNumber });
-  
+
       return { success: true };
     } catch (error) {
       console.error("Error submitting form:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   };
-  
-  
-  
 
   return (
     <FormContext.Provider

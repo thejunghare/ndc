@@ -1,8 +1,8 @@
 export interface User {
   id: string;
   email?: string;
-  username: string,
-  role:string,
+  username: string;
+  role: string;
   createdAt: string;
 }
 
@@ -14,7 +14,7 @@ export interface Session {
 }
 
 export interface UserContextType {
-  current: User | null; // `current` can be `User` or `null`
+  current: User | null;
   signIn: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;

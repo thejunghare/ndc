@@ -53,28 +53,31 @@ const DashboardView = () => {
   const [showToast, setShowToast] = useState(false);
   const [progress, setProgress] = useState(0);
   const { current } = useUser();
-  const [userProfile, setUserProfile] = useState<{ username: string; designation: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{
+    username: string;
+    designation: string;
+  } | null>(null);
 
   // Fetch user profile info
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!current?.id) return;
-      
+
       const { data, error } = await supabase
-        .from('profile')
-        .select('username, designation')
-        .eq('user_id', current.id)
+        .from("profile")
+        .select("username, designation")
+        .eq("user_id", current.id)
         .single();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
+        console.error("Error fetching user profile:", error);
         return;
       }
 
       if (data) {
         setUserProfile({
-          username: data.username || 'User',
-          designation: data.designation || 'No designation'
+          username: data.username || "User",
+          designation: data.designation || "No designation",
         });
       }
     };
@@ -146,7 +149,7 @@ const DashboardView = () => {
       if (response.success) {
         alert("Form submitted successfully!");
         setShowToast(true);
-        updateFormData({ id: response.requestId }); // 🔥 Save requestId here
+        updateFormData({ id: response.requestId });
         resetForm();
       } else {
         console.error("Submission error:", response.error);
@@ -579,7 +582,12 @@ const DashboardView = () => {
                           <Button
                             size="xs"
                             color="warning"
-                            onClick={() => handleReviewRequest(ticketNumberInput, status.admin_id)}
+                            onClick={() =>
+                              handleReviewRequest(
+                                ticketNumberInput,
+                                status.admin_id,
+                              )
+                            }
                             disabled={status.review_requested}
                           >
                             {status.review_requested ? (
@@ -640,8 +648,8 @@ const DashboardView = () => {
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-full">
         <div
-          className="group fixed z-50 flex h-screen w-16 flex-col overflow-hidden bg-white 
-                  shadow-md transition-all duration-300 ease-in-out 
+          className="group fixed z-50 flex h-screen w-16 flex-col overflow-hidden bg-white
+                  shadow-md transition-all duration-300 ease-in-out
                   hover:w-48 md:w-64 md:hover:w-64"
         >
           <div className="flex-1 overflow-y-auto">
