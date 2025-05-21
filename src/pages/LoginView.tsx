@@ -4,7 +4,7 @@ import Header from "../reuseables/Header";
 import { useState } from "react";
 import { useUser } from "../lib/UserContext";
 import { ToastContainer, toast } from "react-toastify";
-import { supabase } from '../db/supabase';
+import { supabase } from "../db/supabase";
 
 const LoginView = () => {
   const [email, setEmail] = useState<string>("");
@@ -14,38 +14,41 @@ const LoginView = () => {
   const { signIn } = useUser();
   const loginFailed = (err: any) => toast(`Login Failed! ${err}`);
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (email: string, password: string , e: any) => {
+    e.preventDefault();
     setDisable(true);
     try {
       // First, sign in with Supabase auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-  
-      if (authError || !authData.user) throw authError || new Error("Login failed");
-  
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (authError || !authData.user)
+        throw authError || new Error("Login failed");
+
       const userId = authData.user.id;
-  
+
       // Fetch role from profile table using the userId
       const { data: profileData, error: profileError } = await supabase
         .from("profile")
         .select("role")
         .eq("user_id", userId)
         .single();
-  
+
       if (profileError) throw profileError;
       if (!profileData) throw new Error("Profile not found");
 
       const userRole = profileData.role;
       console.log("User role is:", userRole);
-  
+
       // Store the role in localStorage
-      localStorage.setItem('userRole', userRole.toString());
+      localStorage.setItem("userRole", userRole.toString());
 
       // Call the signIn function from UserContext to update the user state
       await signIn(email, password);
-  
+
       // Navigate based on role
       if (userRole === 3) {
         navigate("/super-dashboard", { replace: true });
@@ -54,7 +57,6 @@ const LoginView = () => {
       } else {
         navigate("/dashboard", { replace: true });
       }
-  
     } catch (err: any) {
       loginFailed(err.message || err);
       console.error(err.message || err);
@@ -81,7 +83,10 @@ const LoginView = () => {
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
           <h2 className="text-center text-2xl font-semibold">Login</h2>
-          <form className="mt-4 space-y-4">
+          <form
+            className="mt-4 space-y-4"
+            onSubmit={(e) => handleLogin(email, password , e)}
+          >
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="email" value="Your email" />
@@ -108,11 +113,7 @@ const LoginView = () => {
               />
             </div>
 
-            <Button
-              className="w-full"
-              onClick={() => handleLogin(email, password)}
-              disabled={disable}
-            >
+            <Button className="w-full" type="submit" disabled={disable}>
               Login
             </Button>
           </form>
