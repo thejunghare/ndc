@@ -123,7 +123,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         const file = formData.studentPassportSizePhoto;
         const fileExt = file.name.split(".").pop();
         const fileName = `${current.id}/${ticketNumber}-${Date.now()}.${fileExt}`;
-
+        console.log(`uploaded file name ${fileName}`);
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("ndc-passport-size-photo")
           .upload(fileName, file, {
@@ -134,6 +134,8 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         if (uploadError) {
           console.error("Upload error:", uploadError);
           throw new Error(`Failed to upload photo: ${uploadError.message}`);
+        } else {
+          console.info("file uploaded");
         }
 
         const {
@@ -143,6 +145,8 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
           .getPublicUrl(fileName);
 
         photoUrl = publicUrl;
+      } else {
+        console.log("file not found");
       }
 
       const { data: insertResult, error: insertError } = await supabase
@@ -160,7 +164,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
             status: "pending",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            // photo_url: photoUrl,
+            photo_url: photoUrl,
             // ticket_number: ticketNumber,
           },
         ])

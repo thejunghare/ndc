@@ -92,7 +92,7 @@ const DashboardSection = () => {
       setShowSpinner(false);
 
       if (response.success) {
-        alert("Form submitted successfully!");
+        // alert("Form submitted successfully!");
         setShowToast(true);
         updateFormData({ id: response.requestId });
         resetForm();
