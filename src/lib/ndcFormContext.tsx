@@ -136,12 +136,13 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
           throw new Error(`Failed to upload photo: ${uploadError.message}`);
         }
 
-        //   const { data: { publicUrl } } = supabase
-        //     .storage
-        //     .from("ndc-passport-size-photo")
-        //     .getPublicUrl(fileName);
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("ndc-passport-size-photo")
+          .getPublicUrl(fileName);
 
-        //   photoUrl = publicUrl;
+        photoUrl = publicUrl;
       }
 
       const { data: insertResult, error: insertError } = await supabase
@@ -160,7 +161,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             // photo_url: photoUrl,
-            ticket_number: ticketNumber,
+            // ticket_number: ticketNumber,
           },
         ])
         .select("id")
