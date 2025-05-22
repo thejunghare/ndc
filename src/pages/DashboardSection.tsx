@@ -8,6 +8,7 @@ import {
   Textarea,
   Progress,
   Spinner,
+  FileInput,
 } from "flowbite-react";
 import { useState, useEffect, useRef } from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
@@ -93,7 +94,7 @@ const DashboardSection = () => {
       if (response.success) {
         alert("Form submitted successfully!");
         setShowToast(true);
-        updateFormData({ id: response.requestId }); // 🔥 Save requestId here
+        updateFormData({ id: response.requestId });
         resetForm();
       } else {
         console.error("Submission error:", response.error);
@@ -206,6 +207,10 @@ const DashboardSection = () => {
                         id="name"
                         placeholder="Enter Name"
                         type="text"
+                        value={formData.studentName}
+                        onChange={(e) =>
+                          updateFormData({ studentName: e.target.value })
+                        }
                         required
                       />
                     </div>
@@ -217,24 +222,23 @@ const DashboardSection = () => {
                           value="Passport Size Photo"
                         />
                       </div>
-                      {/*<FileInput*/}
-                      {/*  id="passport_photo"*/}
-                      {/*  accept="image/*"*/}
-                      {/*  onChange={(e) => {*/}
-                      {/*    const file = e.target.files?.[0];*/}
-                      {/*    if (file) {*/}
-                      {/*      // Validate file size (e.g., max 2MB)*/}
-                      {/*      if (file.size > 2 * 1024 * 1024) {*/}
-                      {/*        alert('Please upload an image smaller than 2MB');*/}
-                      {/*        return;*/}
-                      {/*      }*/}
-                      {/*      updateFormData({*/}
-                      {/*        studentPassportSizePhoto: file*/}
-                      {/*      });*/}
-                      {/*    }*/}
-                      {/*  }}*/}
-                      {/*  required*/}
-                      {/*/>*/}
+                      <FileInput
+                        id="passport_photo"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 2 * 1024 * 1024) {
+                              alert("Please upload an image smaller than 2MB");
+                              return;
+                            }
+                            updateFormData({
+                              studentPassportSizePhoto: file,
+                            });
+                          }
+                        }}
+                        required
+                      />
                     </div>
                   </div>
 

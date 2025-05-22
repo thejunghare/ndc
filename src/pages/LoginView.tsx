@@ -83,6 +83,7 @@ const LoginView = () => {
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
           <h2 className="text-center text-2xl font-semibold">Login</h2>
+          <p className={"text-center"}>By continuing, you agree to our User Agreement and acknowledge that you understand the Privacy Policy.</p>
           <form
             className="mt-4 space-y-4"
             onSubmit={(e) => handleLogin(email, password , e)}
@@ -113,9 +114,20 @@ const LoginView = () => {
               />
             </div>
 
+            <div className="mb-2 flex justify-start items-center">
+              <Checkbox id="accept" defaultChecked />
+              <div className={"ml-2"}>
+                <label htmlFor="remeber_password">Remember Password</label>
+              </div>
+            </div>
+
             <Button className="w-full" type="submit" disabled={disable}>
               Login
             </Button>
+            <div className="flex items-center justify-around w-full">
+              <a href="/forgot-password" className="underline">Forgot Password</a>
+              <a href="/create-account" className={"underline"}>Create Account</a>
+            </div>
           </form>
         </div>
       </div>

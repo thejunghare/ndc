@@ -3,7 +3,7 @@ import Header from "../reuseables/Header";
 import { useState } from "react";
 import { useUser } from "../lib/UserContext";
 import { ToastContainer, toast } from "react-toastify";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const CreateAccountView = () => {
   const [email, setEmail] = useState<string>("");
@@ -91,7 +91,7 @@ const CreateAccountView = () => {
             </Button>
           </form>
 
-          <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
+          <div className="mt-2 flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
             Already registered?&nbsp;
             <a
               href="#"

@@ -110,9 +110,39 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
 
   const submitForm = async () => {
     try {
-      if (!current) throw new Error("User not authenticated");
+      if (!current) {
+        throw new Error(
+          "User not authenticated. Please log in to submit the form.",
+        );
+      }
 
       const ticketNumber = `NDC-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      let photoUrl = null;
+      if (formData.studentPassportSizePhoto) {
+        const file = formData.studentPassportSizePhoto;
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${current.id}/${ticketNumber}-${Date.now()}.${fileExt}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("ndc-passport-size-photo")
+          .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw new Error(`Failed to upload photo: ${uploadError.message}`);
+        }
+
+        //   const { data: { publicUrl } } = supabase
+        //     .storage
+        //     .from("ndc-passport-size-photo")
+        //     .getPublicUrl(fileName);
+
+        //   photoUrl = publicUrl;
+      }
 
       const { data: insertResult, error: insertError } = await supabase
         .from("ndc_part_one")
@@ -129,12 +159,17 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
             status: "pending",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
+            // photo_url: photoUrl,
+            ticket_number: ticketNumber,
           },
         ])
         .select("id")
         .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        throw new Error(`Failed to save form data: ${insertError.message}`);
+      }
 
       const ndcRequestId = insertResult.id;
 
