@@ -84,3 +84,27 @@ async function fetchUser() {
 }
 
 fetchUser();
+
+function* generateSequence() {
+  yield 1;
+  yield 2;
+  return 3;
+}
+
+let generator = generateSequence();
+
+for(let value of generator) {
+  alert(value); // 1, then 2
+}
+
+// 📁 sayHi.js
+export function sayHi(user) {
+  alert(`Hello, ${user}!`);
+}
+…Then another file may import and use it:
+
+// 📁 main.js
+import {sayHi} from './sayHi.js';
+
+alert(sayHi); // function...
+sayHi('John'); // Hello, John!
