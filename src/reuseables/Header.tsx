@@ -14,7 +14,7 @@ const Header = ({ onLogout }: { onLogout?: () => void }) => (
         </span> */}
       </Navbar.Brand>
       <div className="flex md:order-2">
-        {onLogout && <Button onClick={onLogout}>Logout</Button>}
+        {onLogout && <Button size={"sm"} color={"warning"} className="rounded-md shadow" onClick={onLogout}>Logout</Button>}
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>

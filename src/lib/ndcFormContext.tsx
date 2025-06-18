@@ -14,7 +14,7 @@ interface PersonalDetailsFormData {
   studentPhoneNumber: string;
   studentEmailAddress: string;
   studentAddress: string;
-  status?: string;
+  //status?: string;
   ticketNumber?: string;
 }
 
@@ -34,7 +34,7 @@ interface ndcTickets {
   email: string;
   address: string;
   user_id: string;
-  status: string;
+  //status: string;
   created_at: string;
   updated_at: string;
 }
@@ -65,7 +65,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
     studentPhoneNumber: "",
     studentEmailAddress: "",
     studentAddress: "",
-    status: "pending",
+    //status: "pending",
   });
 
   const updateFormData = (newData: Partial<PersonalDetailsFormData>) => {
@@ -82,7 +82,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
       studentPhoneNumber: "",
       studentEmailAddress: "",
       studentAddress: "",
-      status: "pending",
+      //status: "pending",
     });
   };
 
@@ -161,7 +161,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
             email: formData.studentEmailAddress,
             address: formData.studentAddress,
             user_id: current.id,
-            status: "pending",
+            //status: "pending",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             photo_url: photoUrl,
@@ -197,7 +197,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
       const approvalEntries = validAdmins.map((admin) => ({
         request_id: ndcRequestId,
         admin_id: admin.user_id,
-        status: "pending",
+        //status: "pending",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }));

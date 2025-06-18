@@ -23,7 +23,6 @@ import ProfileView from "./ProfileView";
 import SettingsView from "./SettingsView";
 import DashboardSection from "./DashboardSection";
 
-
 const DashboardView = () => {
   const { current } = useUser();
   const [userProfile, setUserProfile] = useState<{
@@ -58,18 +57,14 @@ const DashboardView = () => {
     fetchUserProfile();
   }, [current?.id]);
 
- 
   //console.log('list of courses: ',courses);
-
-
-
 
   const [selectedSection, setSelectedSection] = useState("dashboard");
 
   const renderSection = () => {
     switch (selectedSection) {
       case "dashboard":
-        return <DashboardSection/>;
+        return <DashboardSection />;
       case "profile":
         return <ProfileView />;
       case "requests":
@@ -116,13 +111,7 @@ const DashboardView = () => {
                       icon: HiCloudDownload,
                       label: "Dashboard",
                     },
-                    { key: "profile", icon: HiUserCircle, label: "Profile" },
                     { key: "requests", icon: HiInbox, label: "My Requests" },
-                    {
-                      key: "settings",
-                      icon: HiOutlineAdjustments,
-                      label: "Settings",
-                    },
                   ].map(({ key, icon, label }) => (
                     <SidebarItem
                       key={key}
@@ -146,19 +135,32 @@ const DashboardView = () => {
                     <Badge color="warning">Beta</Badge>
                     <button
                       aria-label="Close"
-                      className="-m-1.5 ml-auto hidden h-6 w-6 rounded-lg bg-gray-100 p-1 text-cyan-900 hover:bg-gray-200 md:inline-flex"
+                      className="-m-1.5 ml-auto inline-flex h-6 w-6 rounded-lg bg-gray-100 p-1 text-cyan-900 hover:bg-gray-200 focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+                      type="button"
                     >
-                      {/* SVG icon */}
+                      <svg
+                        aria-hidden
+                        className="h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </button>
                   </div>
-                  <div className="mb-3 hidden truncate text-sm text-cyan-900 group-hover:block md:block">
-                    Preview the new NDC dashboard! Found a bug? Report it.
+                  <div className="mb-3 text-sm text-cyan-900 dark:text-gray-400">
+                    Preview the new NDC dashboard navigation! 
                   </div>
                   <a
-                    className="hidden truncate text-sm text-cyan-900 underline hover:text-cyan-800 group-hover:block md:block"
+                    className="text-sm text-cyan-900 underline hover:text-cyan-800 dark:text-gray-400 dark:hover:text-gray-300"
                     href="#"
                   >
-                    Feedback Form
+                    Hey I found a bug!
                   </a>
                 </SidebarCTA>
               </SidebarItemGroup>
@@ -170,8 +172,6 @@ const DashboardView = () => {
         <div className="ml-16 w-[calc(100%-4rem)] p-4 sm:p-6 md:ml-64 md:w-[calc(100%-16rem)]">
           {renderSection()}
         </div>
-
-       
       </div>
     </div>
   );

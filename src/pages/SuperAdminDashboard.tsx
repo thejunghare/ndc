@@ -143,9 +143,9 @@ const SuperAdminDashboard = () => {
     doc.setFont("helvetica", "bold").text(String(ticket.id), 60, y);
     y += lineGap;
 
-    doc.text(`Status:`, 25, y);
-    doc.setFont("helvetica", "bold").text(ticket.status, 60, y);
-    y += lineGap;
+//    doc.text(`Status:`, 25, y);
+//    doc.setFont("helvetica", "bold").text(ticket.status, 60, y);
+//    y += lineGap;
 
     doc.text(`Created:`, 25, y);
     doc.setFont("helvetica", "bold").text(new Date(ticket.created_at).toLocaleDateString(), 60, y);

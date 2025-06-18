@@ -9,12 +9,13 @@ import {
   Progress,
   Spinner,
   FileInput,
+  Select,
 } from "flowbite-react";
 import { useState, useEffect, useRef } from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
 import { useForm } from "../lib/ndcFormContext";
 import { useUser } from "../lib/UserContext";
-import { HiRefresh } from "react-icons/hi";
+import { HiRefresh, HiCheck } from "react-icons/hi";
 import { supabase } from "../db/supabase";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
 import ToastComponent from "../reuseables/ToastComponent";
@@ -25,11 +26,6 @@ const DashboardSection = () => {
   const [progress, setProgress] = useState(0);
   const { current } = useUser();
   const inputRef = useRef(null);
-  //  if (current){
-  //    console.log(current);
-  //  }else {
-  //    console.log('not auth')
-  //  }
   const {
     formData,
     updateFormData,
@@ -38,17 +34,13 @@ const DashboardSection = () => {
     courses,
     listCourses,
   } = useForm();
-  //console.log('list of courses: ',courses);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       await listCourses();
     };
-
     fetchData();
-    //console.log('list ',courses)
   }, []);
 
   useEffect(() => {
@@ -62,7 +54,6 @@ const DashboardSection = () => {
           setProgress(currentProgress);
         }
       }, 20);
-
       return () => clearInterval(interval);
     }
   }, [isSubmitting]);
@@ -70,6 +61,9 @@ const DashboardSection = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openStatusModal, setOpenStatusModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [ticketNumberInput, setTicketNumberInput] = useState("");
+  const [approvalStatusList, setApprovalStatusList] = useState([]);
+  const [trackError, setTrackError] = useState("");
 
   const onCloseModal = () => setOpenModal(false);
   const onCloseStatusModal = () => setOpenStatusModal(false);
@@ -82,17 +76,16 @@ const DashboardSection = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setOpenModal(false);
     setShowSpinner(true);
 
     try {
       const response = await submitForm();
-
       setShowSpinner(false);
 
       if (response.success) {
-        // alert("Form submitted successfully!");
         setShowToast(true);
         updateFormData({ id: response.requestId });
         resetForm();
@@ -109,16 +102,11 @@ const DashboardSection = () => {
     }
   };
 
-  const [ticketNumberInput, setTicketNumberInput] = useState("");
-  const [approvalStatusList, setApprovalStatusList] = useState([]);
-  const [trackError, setTrackError] = useState("");
-
   const handleTrackStatusSubmit = async () => {
     const requestId = ticketNumberInput.trim();
     if (!requestId) return alert("Please enter a ticket number");
 
     const result = await trackApprovalStatus(requestId);
-
     if (result.success) {
       setProgress(result.progressPercent);
       setApprovalStatusList(result.statusList);
@@ -130,7 +118,7 @@ const DashboardSection = () => {
     }
   };
 
-  const handleReviewRequest = async (requestId: string) => {
+  const handleReviewRequest = async (requestId) => {
     try {
       if (!requestId || typeof requestId !== "string") {
         alert("Invalid request ID");
@@ -150,13 +138,9 @@ const DashboardSection = () => {
 
       if (resetError) throw resetError;
 
-      // Update main request using existing columns
       const { error: requestError } = await supabase
         .from("ndc_part_one")
-        .update({
-          status: "under_review",
-          updated_at: new Date().toISOString(),
-        })
+        .update({ updated_at: new Date().toISOString() })
         .eq("id", requestId);
 
       if (requestError) throw requestError;
@@ -171,60 +155,43 @@ const DashboardSection = () => {
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-100">
-      {/* <div className="text-xl font-bold">Welcome {current?.email}</div> */}
-      {/*<p>*/}
-      {/*  {current?.email*/}
-      {/*    ? `${current.email} - ${current.id}`*/}
-      {/*    : "No User Found"}*/}
-      {/*</p>*/}
-
       <div className="relative flex space-x-4">
-        {/* Fill NDC */}
         <div className="relative">
           <Button onClick={() => setOpenModal(true)}>Fill NDC Form</Button>
           {showSpinner && (
-            <div className="absolute bottom-0 left-0 right-0 top-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <SpinnerComponent />
             </div>
           )}
         </div>
+
         <Modal show={openModal} size="xl" onClose={onCloseModal} popup>
           <Modal.Header />
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="p-4">
-              {/* Modal content */}
               {currentPage === 1 && (
                 <div className="space-y-4">
-                  <h2 className="mb-4 border-b-2 border-gray-300 pb-2 text-center text-2xl font-extrabold text-gray-900 dark:text-white">
+                  <h2 className="mb-4 border-b-2 text-center text-2xl font-bold text-gray-900">
                     Part 1: Personal Details
                   </h2>
+
                   <div className="flex space-x-4">
                     <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="name" value="Name of Student" />
-                      </div>
+                      <Label htmlFor="name" value="Name of Student *" />
                       <TextInput
                         id="name"
                         placeholder="Enter Name"
-                        type="text"
                         value={formData.studentName}
-                        onChange={(e) =>
-                          updateFormData({ studentName: e.target.value })
-                        }
+                        onChange={(e) => updateFormData({ studentName: e.target.value })}
                         required
                       />
                     </div>
 
                     <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label
-                          htmlFor="passport_photo"
-                          value="Passport Size Photo"
-                        />
-                      </div>
+                      <Label htmlFor="passport_photo" value="Passport Size Photo * (JPG/PNG, Max 2MB)" />
                       <FileInput
                         id="passport_photo"
-                        accept="image/*"
+                        accept="image/jpeg, image/png"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
@@ -232,9 +199,11 @@ const DashboardSection = () => {
                               alert("Please upload an image smaller than 2MB");
                               return;
                             }
-                            updateFormData({
-                              studentPassportSizePhoto: file,
-                            });
+                            if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                              alert("Only JPG or PNG files allowed");
+                              return;
+                            }
+                            updateFormData({ studentPassportSizePhoto: file });
                           }
                         }}
                         required
@@ -244,57 +213,27 @@ const DashboardSection = () => {
 
                   <div className="flex space-x-4">
                     <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="course" value="Course" />
-                      </div>
-                      {/*   <Select
-                      id="course"
-                      required
-                      value={formData.studentCourseName}
-                      onChange={(e) => updateFormData({studentCourseName: e.target.value})}
-                    >
-                      <option value="">Select a course</option>
-                      {courses.map((course) => (
-                        <option key={course.id} value={course.id}>
-                          {course.name}
-                        </option>
-                      ))}
-                    </Select> */}
-
-                      <TextInput
-                        id="name"
-                        placeholder="Enter Name"
+                      <Label htmlFor="course" value="Course *" />
+                      <Select
+                        id="course"
                         value={formData.studentCourseName}
-                        onChange={(e) =>
-                          updateFormData({ studentCourseName: e.target.value })
-                        }
+                        onChange={(e) => updateFormData({ studentCourseName: e.target.value })}
                         required
-                      />
+                      >
+                        <option value="">Select a course</option>
+                        {courses.map((course) => (
+                          <option key={course.id} value={course.name}>{course.name}</option>
+                        ))}
+                      </Select>
                     </div>
 
                     <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="batch" value="Batch" />
-                      </div>
-                      {/*   <Select
-                      id="batch"
-                      required
-                      value={formData.studentBatch}
-                      onChange={(e) => updateFormData({studentBatch: e.target.value})}
-                    >
-                      <option value="">Select batch</option>
-                      <option value="1">2021-2025</option>
-                      <option value="2">2022-2026</option>
-                      <option value="3">2023-2027</option>
-                      <option value="4">2024-2028</option>
-                    </Select> */}
+                      <Label htmlFor="batch" value="Batch *" />
                       <TextInput
-                        id="name"
-                        placeholder="Enter Name"
+                        id="batch"
+                        placeholder="Enter Batch (eg: 2021-2025)"
                         value={formData.studentBatch}
-                        onChange={(e) =>
-                          updateFormData({ studentBatch: e.target.value })
-                        }
+                        onChange={(e) => updateFormData({ studentBatch: e.target.value })}
                         required
                       />
                     </div>
@@ -302,33 +241,26 @@ const DashboardSection = () => {
 
                   <div className="flex space-x-4">
                     <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="roll_no" value="Roll Number" />
-                      </div>
+                      <Label htmlFor="roll_no" value="Roll Number *" />
                       <TextInput
                         id="roll_no"
                         placeholder="Enter Roll Number"
-                        type="text"
                         value={formData.studentRollNumber}
-                        onChange={(e) =>
-                          updateFormData({ studentRollNumber: e.target.value })
-                        }
+                        onChange={(e) => updateFormData({ studentRollNumber: e.target.value })}
                         required
                       />
                     </div>
 
                     <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="Phone_number" value="Phone Number" />
-                      </div>
+                      <Label htmlFor="phone" value="Phone Number * (10 digits)" />
                       <TextInput
-                        id="batch"
+                        id="phone"
                         placeholder="Enter Phone Number"
-                        type="text"
                         value={formData.studentPhoneNumber}
-                        onChange={(e) =>
-                          updateFormData({ studentPhoneNumber: e.target.value })
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          if (value.length <= 10) updateFormData({ studentPhoneNumber: value });
+                        }}
                         required
                       />
                     </div>
@@ -338,195 +270,94 @@ const DashboardSection = () => {
 
               {currentPage === 2 && (
                 <div className="space-y-4">
-                  <h2 className="mb-4 border-b-2 border-gray-300 pb-2 text-center text-2xl font-extrabold text-gray-900 dark:text-white">
+                  <h2 className="mb-4 border-b-2 text-center text-2xl font-bold text-gray-900">
                     Part 2: Additional Details
                   </h2>
-                  <div className="flex">
-                    <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="email" value="Your Email*" />
-                      </div>
-                      <TextInput
-                        id="address"
-                        placeholder="Enter Email"
-                        required
-                        value={formData.studentEmailAddress}
-                        onChange={(e) =>
-                          updateFormData({
-                            studentEmailAddress: e.target.value,
-                          })
-                        }
-                        type="email"
-                      />
-                    </div>
+
+                  <div>
+                    <Label htmlFor="email" value="Your Email *" />
+                    <TextInput
+                      id="email"
+                      type="email"
+                      placeholder="Enter Email"
+                      value={formData.studentEmailAddress}
+                      onChange={(e) => updateFormData({ studentEmailAddress: e.target.value })}
+                      required
+                    />
                   </div>
 
-                  <div className="flex">
-                    <div className="flex-1">
-                      <div className="mb-2 block">
-                        <Label htmlFor="address" value="Your Address*" />
-                      </div>
-                      <Textarea
-                        id="address"
-                        placeholder="Enter Address"
-                        value={formData.studentAddress}
-                        onChange={(e) =>
-                          updateFormData({ studentAddress: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="address" value="Your Address *" />
+                    <Textarea
+                      id="address"
+                      placeholder="Enter Address"
+                      value={formData.studentAddress}
+                      onChange={(e) => updateFormData({ studentAddress: e.target.value })}
+                      required
+                    />
                   </div>
                 </div>
               )}
             </div>
+
             <div className="flex justify-between p-4">
-              <Button
-                type="button"
-                color={currentPage === 1 ? "gray" : undefined}
-                onClick={currentPage === 1 ? onCloseModal : handlePrevPage}
-              >
+              <Button type="button" color={currentPage === 1 ? "gray" : undefined} onClick={currentPage === 1 ? onCloseModal : handlePrevPage}>
                 {currentPage === 1 ? "Cancel" : "Previous"}
               </Button>
-
-              <Button
-                type={currentPage < 2 ? "button" : "submit"}
-                onClick={currentPage < 2 ? handleNextPage : handleSubmit}
-              >
+              <Button type={currentPage < 2 ? "button" : "submit"} onClick={currentPage < 2 ? handleNextPage : undefined}>
                 {currentPage < 2 ? "Next" : "Submit & Send Request"}
               </Button>
             </div>
           </form>
         </Modal>
 
-        {/* Track status */}
         <Button onClick={() => setOpenStatusModal(true)}>Track Status</Button>
-        <Modal
-          show={openStatusModal}
-          size="xl"
-          onClose={onCloseStatusModal}
-          popup
-        >
-          <Modal.Header />
-          <div className="space-y-4 p-4">
-            {/* Ticket Number Input */}
-            <div>
-              <Label value="Ticket Number" />
-              <TextInput
-                value={ticketNumberInput}
-                onChange={(e) => setTicketNumberInput(e.target.value)}
-                className="mb-4"
-                placeholder="Enter request ID"
-                autoFocus
-              />
-            </div>
 
-            <Button
-              onClick={handleTrackStatusSubmit}
-              className="w-full"
-              disabled={!ticketNumberInput.trim()}
-            >
+        <Modal show={openStatusModal} size="xl" onClose={onCloseStatusModal} popup>
+          <Modal.Header />
+          <div className="p-4 space-y-4">
+            <Label value="Ticket Number" />
+            <TextInput
+              value={ticketNumberInput}
+              onChange={(e) => setTicketNumberInput(e.target.value)}
+              placeholder="Enter request ID"
+              autoFocus
+            />
+            <Button onClick={handleTrackStatusSubmit} disabled={!ticketNumberInput.trim()} className="w-full">
               Check Status
             </Button>
 
-            {/* Status Display */}
+            {/* Status Results */}
             {approvalStatusList.length > 0 && (
               <div className="space-y-4">
-                {/* Overall Status */}
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold">
-                    Approval Status:{" "}
-                    <span
-                      className={
-                        approvalStatusList.every((s) => s.status === "rejected")
-                          ? "text-red-600"
-                          : approvalStatusList.every(
-                                (s) => s.status === "approved",
-                              )
-                            ? "text-green-600"
-                            : "text-yellow-600"
-                      }
-                    >
-                      {approvalStatusList.every((s) => s.status === "rejected")
-                        ? "Rejected"
-                        : approvalStatusList.every(
-                              (s) => s.status === "approved",
-                            )
-                          ? "Approved"
-                          : "In Review"}
-                    </span>
-                  </h3>
-                </div>
-
-                {/* Progress Bar */}
-                <Progress
-                  progress={progress}
-                  size="lg"
-                  color={
-                    approvalStatusList.every((s) => s.status === "rejected")
-                      ? "red"
-                      : approvalStatusList.every((s) => s.status === "approved")
-                        ? "green"
-                        : "blue"
+                <h3 className="text-xl font-semibold text-center">
+                  Approval Status: {
+                    approvalStatusList.every((s) => s.status === "approved") ?
+                      <span className="text-green-600">Approved</span> :
+                      approvalStatusList.every((s) => s.status === "rejected") ?
+                      <span className="text-red-600">Rejected</span> :
+                      <span className="text-yellow-600">In Review</span>
                   }
-                  textLabelPosition="inside"
-                  textLabel={`${progress}% complete`}
-                />
-
-                {/* Detailed Status List */}
+                </h3>
+                <Progress progress={progress} size="lg" color="blue" textLabel={`${progress}% complete`} textLabelPosition="inside" />
                 <div className="space-y-2">
                   {approvalStatusList.map((status, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col space-y-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <span className="block truncate font-medium">
-                          {status.profile?.name || `Admin ${index + 1}`}
-                        </span>
-
+                    <div key={index} className="flex justify-between border rounded-lg p-3">
+                      <div>
+                        <div className="font-medium">{status.profile?.name || `Admin ${index + 1}`}</div>
                         {status.status === "rejected" && (
-                          <div className="mt-1 truncate text-sm text-red-700">
-                            <strong>Remark:</strong>{" "}
-                            {status?.remarks || "No remarks provided"}
-                          </div>
+                          <div className="text-sm text-red-600">Remark: {status.remarks || "No remarks"}</div>
                         )}
                       </div>
-
-                      <div className="mt-2 flex items-center space-x-2 sm:mt-0">
-                        <span
-                          className={`rounded-full px-3 py-1 text-sm capitalize ${
-                            status.status === "approved"
-                              ? "bg-green-100 text-green-800"
-                              : status.status === "rejected"
-                                ? "bg-red-100 text-red-800"
-                                : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-3 py-1 rounded-full text-sm capitalize ${
+                          status.status === "approved" ? "bg-green-100 text-green-800" :
+                          status.status === "rejected" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"}`}>
                           {status.status}
                         </span>
-
                         {status.status === "rejected" && (
-                          <Button
-                            size="xs"
-                            color="warning"
-                            onClick={() =>
-                              handleReviewRequest(
-                                ticketNumberInput,
-                                status.admin_id,
-                              )
-                            }
-                            disabled={status.review_requested}
-                          >
-                            {status.review_requested ? (
-                              <span className="flex items-center">
-                                <HiCheck className="mr-1" /> Requested
-                              </span>
-                            ) : (
-                              <span className="flex items-center">
-                                <HiRefresh className="mr-1" /> Re-Review
-                              </span>
-                            )}
+                          <Button size="xs" color="warning" onClick={() => handleReviewRequest(ticketNumberInput)} disabled={status.review_requested}>
+                            {status.review_requested ? <><HiCheck className="mr-1" /> Requested</> : <><HiRefresh className="mr-1" /> Re-Review</>}
                           </Button>
                         )}
                       </div>
@@ -536,25 +367,14 @@ const DashboardSection = () => {
               </div>
             )}
 
-            {/* Error Message */}
-            {trackError && (
-              <div className="rounded-lg bg-red-50 p-3">
-                <p className="text-center text-red-600">{trackError}</p>
-              </div>
-            )}
-
-            {/* Loading State */}
-            {isSubmitting && (
-              <div className="flex justify-center py-4">
-                <Spinner size="md" />
-              </div>
-            )}
+            {trackError && <div className="text-center text-red-600">{trackError}</div>}
+            {isSubmitting && <div className="flex justify-center"><Spinner size="md" /></div>}
           </div>
         </Modal>
       </div>
-      {/* Toast Component */}
+
       {showToast && (
-        <div className="fixed right-0 top-0 z-50 mr-4 mt-4">
+        <div className="fixed top-0 right-0 m-4 z-50">
           <ToastComponent />
         </div>
       )}
