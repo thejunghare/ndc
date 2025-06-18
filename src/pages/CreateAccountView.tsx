@@ -11,95 +11,66 @@ const CreateAccountView = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [disable, setDisable] = useState<boolean>(false);
   const { signUp } = useUser();
-  // const navigate = useNavigate();
+
   const accountCreated = () => toast("Account created!");
   const accountCreatedFailed = () => toast("Error while creating account!");
 
-  const handleCreateAccount = async (
-    email: string,
-    confirmPassword: string,
-  ) => {
+  const handleCreateAccount = async (email: string, confirmPassword: string) => {
     setDisable(true);
     if (password === confirmPassword) {
       try {
         await signUp(email, confirmPassword);
         accountCreated();
-        // navigate("/");
-        alert("Please confirm your mail and login")
+        alert("Please confirm your email and login");
       } catch (error) {
         accountCreatedFailed();
         setDisable(false);
       }
-    }else {
-      alert('Password and Confirm password does not match!')
+    } else {
+      alert("Password and Confirm password do not match!");
     }
-  
   };
 
   return (
-    <div>
-      <ToastContainer/>
-      <Header />
-      <div className="flex h-screen items-center justify-center bg-gray-100">
-        <div className="mx-auto w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
-          <h2 className="text-center text-2xl font-semibold">Create Account</h2>
-          <form className="mt-4 space-y-4">
+    <div className="min-h-screen flex">
+      <ToastContainer />
+      {/*<Header />*/}
+      <div className="w-1/2 bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+        <div className="text-white text-center space-y-4">
+          <h1 className="text-4xl font-bold">Join Us</h1>
+          <p className="text-lg">Create your account and start your journey</p>
+          <img src="https://illustrations.popsy.co/gray/work-from-home.svg" alt="Create Account" className="w-3/4 mx-auto" />
+        </div>
+      </div>
+
+      <div className="w-1/2 flex items-center justify-center bg-white">
+        <div className="max-w-md w-full p-8 rounded-lg shadow-lg">
+          <h2 className="text-3xl font-bold mb-4 text-center">Create Account</h2>
+          <form className="space-y-4">
             <div>
-              <div className="mb-2 block">
-                <Label htmlFor="email" value="Your email" />
-              </div>
-              <TextInput
-                id="email"
-                placeholder="name@company.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Label htmlFor="email" value="Email" />
+              <TextInput id="email" placeholder="name@company.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div>
-              <div className="mb-2 block">
-                <Label htmlFor="password" value="Set Password" />
-              </div>
-              <TextInput
-                id="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Label htmlFor="password" value="Password" />
+              <TextInput id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 
             <div>
-              <div className="mb-2 block">
-                <Label htmlFor="confirm_password" value="Confirm Password" />
-              </div>
-              <TextInput
-                id="confirm_password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+              <Label htmlFor="confirm_password" value="Confirm Password" />
+              <TextInput id="confirm_password" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             </div>
 
-            <Button
-              type="button"
-              onClick={() =>
-                handleCreateAccount(email, confirmPassword)
-              }
-            >
+            <Button className="w-full" type="button" onClick={() => handleCreateAccount(email, confirmPassword)} disabled={disable}>
               Register
             </Button>
-          </form>
 
-          <div className="mt-2 flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
-            Already registered?&nbsp;
-            <a
-              href="#"
-              className="text-cyan-700 hover:underline dark:text-cyan-500"
-            >
-              <NavLink to="/">Log In</NavLink>
-            </a>
-          </div>
+            <div className="text-sm text-center mt-4">
+              Already have an account?{" "}
+              <NavLink to="/" className="text-blue-600 hover:underline">Log In</NavLink>
+            </div>
+          </form>
         </div>
       </div>
     </div>
