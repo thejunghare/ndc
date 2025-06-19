@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
-import { supabase } from "../db/supabase";
-import { useUser } from "../lib/UserContext";
-import { ToastContainer, toast } from "react-toastify";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {Button, Checkbox, Label, TextInput} from "flowbite-react";
+import {supabase} from "../db/supabase";
+import {useUser} from "../lib/UserContext";
+import {ToastContainer, toast} from "react-toastify";
 
 const LoginView = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [disable, setDisable] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useUser();
+  const {signIn} = useUser();
 
   const loginFailed = (err) => toast.error(`Login Failed! ${err}`);
 
@@ -18,7 +18,7 @@ const LoginView = () => {
     e.preventDefault();
     setDisable(true);
     try {
-      const { data: authData, error: authError } =
+      const {data: authData, error: authError} =
         await supabase.auth.signInWithPassword({
           email,
           password,
@@ -28,7 +28,7 @@ const LoginView = () => {
         throw authError || new Error("Login failed");
 
       const userId = authData.user.id;
-      const { data: profileData, error: profileError } = await supabase
+      const {data: profileData, error: profileError} = await supabase
         .from("profile")
         .select("role")
         .eq("user_id", userId)
@@ -40,9 +40,9 @@ const LoginView = () => {
       localStorage.setItem("userRole", userRole.toString());
       await signIn(email, password);
 
-      if (userRole === 3) navigate("/super-dashboard", { replace: true });
-      else if (userRole === 2) navigate("/admin-dashboard", { replace: true });
-      else navigate("/dashboard", { replace: true });
+      if (userRole === 3) navigate("/super-dashboard", {replace: true});
+      else if (userRole === 2) navigate("/admin-dashboard", {replace: true});
+      else navigate("/dashboard", {replace: true});
     } catch (err) {
       loginFailed(err.message || err);
       setDisable(false);
@@ -51,10 +51,11 @@ const LoginView = () => {
 
   return (
     <div className="flex min-h-screen">
-      <ToastContainer position="top-center" autoClose={4000} theme="colored" />
+      <ToastContainer position="top-center" autoClose={4000} theme="colored"/>
 
       {/* Left side image */}
-      <div className="m-8 hidden w-1/2 items-center justify-center rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-700 md:flex">
+      <div
+        className="m-8 hidden w-1/2 items-center justify-center rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-700 md:flex">
         <div className="p-8 text-center">
           <h1
             className="mb-4 text-4xl
@@ -85,7 +86,7 @@ const LoginView = () => {
           </p>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label htmlFor="email" value="Email" className="font-medium" />
+              <Label htmlFor="email" value="Email" className="font-medium"/>
               <TextInput
                 id="email"
                 type="email"
@@ -114,7 +115,7 @@ const LoginView = () => {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Checkbox id="remember" />
+                <Checkbox id="remember"/>
                 <Label htmlFor="remember" className="ml-2 text-sm">
                   Remember me
                 </Label>

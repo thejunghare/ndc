@@ -38,11 +38,16 @@ const CreateAccountView = () => {
 
   return (
     <div className="flex min-h-screen">
-      <ToastContainer />
-      {/*<Header />*/}
-      <div className="m-8 flex w-1/2 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-500">
-        <div className="space-y-4 text-center text-white">
-          <h1 className="text-4xl font-bold tracking-tighter antialiased">
+      <ToastContainer position="top-center" autoClose={4000} theme="colored"/>
+
+      {/* Left side image */}
+      <div 
+        className="m-8 hidden w-1/2 items-center justify-center rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-700 md:flex">
+        <div className="p-8 text-center">
+          <h1
+            className="mb-4 text-4xl
+ font-bold tracking-tighter text-white antialiased"
+          >
             Join Us!
           </h1>
           <p className="text-lg font-semibold tracking-tighter antialiased">
