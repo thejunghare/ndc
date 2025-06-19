@@ -18,12 +18,14 @@ const LoginView = () => {
     e.preventDefault();
     setDisable(true);
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (authError || !authData.user) throw authError || new Error("Login failed");
+      if (authError || !authData.user)
+        throw authError || new Error("Login failed");
 
       const userId = authData.user.id;
       const { data: profileData, error: profileError } = await supabase
@@ -48,30 +50,38 @@ const LoginView = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen">
       <ToastContainer position="top-center" autoClose={4000} theme="colored" />
 
       {/* Left side image */}
-      <div className="hidden md:flex w-1/2 bg-gradient-to-tr from-blue-600 to-indigo-700 justify-center items-center">
-        <div className="text-center px-8">
-          <h1 className="text-white text-4xl font-bold mb-4">Welcome Back!</h1>
-          <p className="text-white/80 text-lg">
+      <div className="m-8 hidden w-1/2 items-center justify-center rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-700 md:flex">
+        <div className="p-8 text-center">
+          <h1
+            className="mb-4 text-4xl
+ font-bold tracking-tighter text-white antialiased"
+          >
+            Welcome Back!
+          </h1>
+          <p className="text-lg font-semibold tracking-tighter text-white/80 antialiased">
             Sign in to continue to your dashboard.
           </p>
           <img
             src="https://illustrations.popsy.co/gray/work-from-home.svg"
             alt="login"
-            className="mt-10 max-w-xs mx-auto"
+            className="mx-auto w-3/4"
           />
         </div>
       </div>
 
       {/* Right side form */}
-      <div className="w-full md:w-1/2 flex justify-center items-center p-8">
-        <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Login</h2>
-          <p className="text-sm text-gray-500 mb-6">
-            By continuing, you agree to our User Agreement and acknowledge that you understand the Privacy Policy.
+      <div className="flex w-full items-center justify-center p-8 md:w-1/2">
+        <div className="w-full max-w-md rounded-2xl border bg-white p-8">
+          <h2 className="mb-6 text-3xl font-bold text-gray-900 antialiased">
+            Login
+          </h2>
+          <p className="mb-6 text-sm tracking-tighter text-gray-500 antialiased">
+            By continuing, you agree to our User Agreement and acknowledge that
+            you understand the Privacy Policy.
           </p>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -87,7 +97,11 @@ const LoginView = () => {
             </div>
 
             <div>
-              <Label htmlFor="password" value="Password" className="font-medium" />
+              <Label
+                htmlFor="password"
+                value="Password"
+                className="font-medium"
+              />
               <TextInput
                 id="password"
                 type="password"
@@ -105,19 +119,30 @@ const LoginView = () => {
                   Remember me
                 </Label>
               </div>
-              <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              <a
+                href="/forgot-password"
+                className="text-sm text-blue-600 hover:underline"
+              >
                 Forgot Password?
               </a>
             </div>
 
-            <Button type="submit" disabled={disable} className="w-full text-white font-semibold">
+            <Button
+              type="submit"
+              disabled={disable}
+              color={"dark"}
+              className="w-full rounded-md font-semibold shadow"
+            >
               {disable ? "Logging in..." : "Login"}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm">
-            Don't have an account?{' '}
-            <a href="/create-account" className="text-blue-600 font-medium hover:underline">
+            Don't have an account?{" "}
+            <a
+              href="/create-account"
+              className="font-medium text-blue-600 hover:underline"
+            >
               Sign up
             </a>
           </p>

@@ -1,5 +1,7 @@
+// TODO: fix resposnive desgin
+
 import { Button, Label, TextInput } from "flowbite-react";
-import Header from "../reuseables/Header";
+// import Header from "../reuseables/Header";
 import { useState } from "react";
 import { useUser } from "../lib/UserContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -15,7 +17,10 @@ const CreateAccountView = () => {
   const accountCreated = () => toast("Account created!");
   const accountCreatedFailed = () => toast("Error while creating account!");
 
-  const handleCreateAccount = async (email: string, confirmPassword: string) => {
+  const handleCreateAccount = async (
+    email: string,
+    confirmPassword: string,
+  ) => {
     setDisable(true);
     if (password === confirmPassword) {
       try {
@@ -32,43 +37,85 @@ const CreateAccountView = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen">
       <ToastContainer />
       {/*<Header />*/}
-      <div className="w-1/2 bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-        <div className="text-white text-center space-y-4">
-          <h1 className="text-4xl font-bold">Join Us</h1>
-          <p className="text-lg">Create your account and start your journey</p>
-          <img src="https://illustrations.popsy.co/gray/work-from-home.svg" alt="Create Account" className="w-3/4 mx-auto" />
+      <div className="m-8 flex w-1/2 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-500">
+        <div className="space-y-4 text-center text-white">
+          <h1 className="text-4xl font-bold tracking-tighter antialiased">
+            Join Us!
+          </h1>
+          <p className="text-lg font-semibold tracking-tighter antialiased">
+            Create your account and start your journey
+          </p>
+          <img
+            src="https://illustrations.popsy.co/gray/work-from-home.svg"
+            alt="Create Account"
+            className="mx-auto w-3/4"
+          />
         </div>
       </div>
 
-      <div className="w-1/2 flex items-center justify-center bg-white">
-        <div className="max-w-md w-full p-8 rounded-lg shadow-lg">
-          <h2 className="text-3xl font-bold mb-4 text-center">Create Account</h2>
+      <div className="flex w-full items-center justify-center p-8 md:w-1/2">
+        <div className="w-full max-w-md rounded-2xl border bg-white p-8">
+          <h2 className="mb-6 text-3xl font-bold tracking-tighter text-gray-900 antialiased">
+            Sign Up
+          </h2>
+          <p className="mb-6 text-sm tracking-tighter text-gray-500 antialiased">
+            By continuing, you agree to our User Agreement and acknowledge that
+            you understand the Privacy Policy.
+          </p>
           <form className="space-y-4">
             <div>
               <Label htmlFor="email" value="Email" />
-              <TextInput id="email" placeholder="name@company.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <TextInput
+                id="email"
+                placeholder="you@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div>
               <Label htmlFor="password" value="Password" />
-              <TextInput id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <TextInput
+                id="password"
+                type="password"
+                required
+                value={password}
+                placeholder="••••••••"
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
 
             <div>
               <Label htmlFor="confirm_password" value="Confirm Password" />
-              <TextInput id="confirm_password" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              <TextInput
+                id="confirm_password"
+                type="password"
+                required
+                value={confirmPassword}
+                placeholder="••••••••"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
             </div>
 
-            <Button className="w-full" type="button" onClick={() => handleCreateAccount(email, confirmPassword)} disabled={disable}>
+            <Button
+              className="w-full"
+              type="button"
+              color={"dark"}
+              onClick={() => handleCreateAccount(email, confirmPassword)}
+              disabled={disable}
+            >
               Register
             </Button>
 
-            <div className="text-sm text-center mt-4">
+            <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              <NavLink to="/" className="text-blue-600 hover:underline">Log In</NavLink>
+              <NavLink to="/" className="text-blue-600 hover:underline">
+                Log In
+              </NavLink>
             </div>
           </form>
         </div>
