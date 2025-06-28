@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-import { supabase } from "../db/supabase";
-import { useUser } from "./UserContext";
+import React, {createContext, useContext, useState} from "react";
+import {supabase} from "../db/supabase";
+import {useUser} from "./UserContext";
 
 interface PersonalDetailsFormData {
   userId?: number;
@@ -51,8 +51,8 @@ interface FormContextType {
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
-export const FormProvider = ({ children }: { children: React.ReactNode }) => {
-  const { current } = useUser();
+export const FormProvider = ({children}: { children: React.ReactNode }) => {
+  const {current} = useUser();
   const [courses, setCourses] = useState<Course[]>([]);
   const [ndcTickets, setNdcTickets] = useState<ndcTickets[]>([]);
   //console.log(course);
@@ -69,7 +69,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const updateFormData = (newData: Partial<PersonalDetailsFormData>) => {
-    setFormData((prev) => ({ ...prev, ...newData }));
+    setFormData((prev) => ({...prev, ...newData}));
   };
 
   const resetForm = () => {
@@ -87,7 +87,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const listCourses = async () => {
-    const { data, error } = await supabase.from("course").select("name");
+    const {data, error} = await supabase.from("course").select("name");
 
     if (error) {
       console.log(error);
@@ -97,7 +97,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const listTickets = async () => {
-    const { data, error } = await supabase.from("ndc_part_one").select();
+    const {data, error} = await supabase.from("ndc_part_one").select();
 
     if (error) {
       console.log(error);
@@ -111,9 +111,10 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   const submitForm = async () => {
     try {
       if (!current) {
-        throw new Error(
-          "User not authenticated. Please log in to submit the form.",
-        );
+        return {
+          success: false,
+          error: "User not authenticated. Please log in to submit the form.",
+        };
       }
 
       const ticketNumber = `NDC-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -124,7 +125,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         const fileExt = file.name.split(".").pop();
         const fileName = `${current.id}/${ticketNumber}-${Date.now()}.${fileExt}`;
         console.log(`uploaded file name ${fileName}`);
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const {data: uploadData, error: uploadError} = await supabase.storage
           .from("ndc-passport-size-photo")
           .upload(fileName, file, {
             cacheControl: "3600",
@@ -132,14 +133,16 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
           });
 
         if (uploadError) {
-          console.error("Upload error:", uploadError);
-          throw new Error(`Failed to upload photo: ${uploadError.message}`);
+          return {
+            success: false,
+            error: "Failed to upload photo",
+          };
         } else {
           console.info("file uploaded");
         }
 
         const {
-          data: { publicUrl },
+          data: {publicUrl},
         } = supabase.storage
           .from("ndc-passport-size-photo")
           .getPublicUrl(fileName);
@@ -149,7 +152,7 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("file not found");
       }
 
-      const { data: insertResult, error: insertError } = await supabase
+      const {data: insertResult, error: insertError} = await supabase
         .from("ndc_part_one")
         .insert([
           {
@@ -172,18 +175,25 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (insertError) {
-        console.error("Insert error:", insertError);
-        throw new Error(`Failed to save form data: ${insertError.message}`);
+        return {
+          success: false,
+          error: `Failed to save form data: ${insertError.message}`,
+        };
       }
 
       const ndcRequestId = insertResult.id;
 
-      const { data: adminsRaw, error: adminFetchError } = await supabase
+      const {data: adminsRaw, error: adminFetchError} = await supabase
         .from("profile")
         .select("user_id")
         .eq("role", 2);
 
-      if (adminFetchError) throw adminFetchError;
+      if (adminFetchError) {
+        return {
+          success: false,
+          error: adminFetchError,
+        };
+      }
 
       const validAdmins = (adminsRaw || []).filter(
         (admin) =>
@@ -191,7 +201,10 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       if (validAdmins.length === 0) {
-        throw new Error("No valid admins found for approvals.");
+        return {
+          success: false,
+          error: `No valid admins found for approvals.`,
+        };
       }
 
       const approvalEntries = validAdmins.map((admin) => ({
@@ -202,15 +215,20 @@ export const FormProvider = ({ children }: { children: React.ReactNode }) => {
         updated_at: new Date().toISOString(),
       }));
 
-      const { error: approvalInsertError } = await supabase
+      const {error: approvalInsertError} = await supabase
         .from("ndc_approval")
         .insert(approvalEntries);
 
-      if (approvalInsertError) throw approvalInsertError;
+      if (approvalInsertError) {
+        return {
+          success: false,
+          error: approvalInsertError,
+        }
+      }
 
-      updateFormData({ ticketNumber });
+      updateFormData({ticketNumber});
 
-      return { success: true };
+      return {success: true};
     } catch (error) {
       console.error("Error submitting form:", error);
       return {
