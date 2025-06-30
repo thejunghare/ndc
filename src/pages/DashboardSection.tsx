@@ -19,6 +19,86 @@ import { HiRefresh, HiCheck } from "react-icons/hi";
 import { supabase } from "../db/supabase";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
 import ToastComponent from "../reuseables/ToastComponent";
+import { FiLock } from "react-icons/fi";
+import { motion } from "framer-motion";
+
+const TARGET_TEXT = "Fill NDC";
+// const CYCLES_PER_LETTER = 2;
+// const SHUFFLE_TIME = 50;
+
+const CHARS = "!@#$%^&*():{};|,.<>/?";
+
+const EncryptButton = () => {
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const [text, setText] = useState(TARGET_TEXT);
+
+  const scramble = () => {
+    let pos = 0;
+
+    intervalRef.current = setInterval(() => {
+      const scrambled = TARGET_TEXT.split("")
+        .map((char, index) => {
+          if (pos / CYCLES_PER_LETTER > index) {
+            return char;
+          }
+
+          const randomCharIndex = Math.floor(Math.random() * CHARS.length);
+          const randomChar = CHARS[randomCharIndex];
+
+          return randomChar;
+        })
+        .join("");
+
+      setText(scrambled);
+      pos++;
+
+      if (pos >= TARGET_TEXT.length * CYCLES_PER_LETTER) {
+        stopScramble();
+      }
+    }, SHUFFLE_TIME);
+  };
+
+  const stopScramble = () => {
+    clearInterval(intervalRef.current || undefined);
+
+    setText(TARGET_TEXT);
+  };
+
+  return (
+    <motion.button
+      whileHover={{
+        scale: 1.025,
+      }}
+      whileTap={{
+        scale: 0.975,
+      }}
+      onMouseEnter={scramble}
+      onMouseLeave={stopScramble}
+      className="group relative overflow-hidden rounded-lg border-[1px] border-neutral-500 bg-neutral-700 px-4 py-2 font-mono font-medium uppercase text-neutral-300 transition-colors hover:text-indigo-300"
+    >
+      <div className="relative z-10 flex items-center gap-2">
+        <FiLock />
+        <span>{text}</span>
+      </div>
+      <motion.span
+        initial={{
+          y: "100%",
+        }}
+        animate={{
+          y: "-100%",
+        }}
+        transition={{
+          repeat: Infinity,
+          repeatType: "mirror",
+          duration: 1,
+          ease: "linear",
+        }}
+        className="absolute inset-0 z-0 scale-125 bg-gradient-to-t from-indigo-400/0 from-40% via-indigo-400/100 to-indigo-400/0 to-60% opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      />
+    </motion.button>
+  );
+};
 
 const DashboardSection = () => {
   const [showSpinner, setShowSpinner] = useState(false);
@@ -154,10 +234,17 @@ const DashboardSection = () => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
+    <div className="flex h-screen items-center justify-center">
       <div className="relative flex space-x-4">
         <div className="relative">
-          <Button onClick={() => setOpenModal(true)}>Fill NDC Form</Button>
+          <Button
+            onClick={() => setOpenModal(true)}
+            color={"dark"}
+            className="rounded-md text-sm font-medium shadow"
+          >
+            Fill NDC Form
+          </Button>
+          {/* <EncryptButton /> */}
           {showSpinner && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <SpinnerComponent />
@@ -182,13 +269,18 @@ const DashboardSection = () => {
                         id="name"
                         placeholder="Enter Name"
                         value={formData.studentName}
-                        onChange={(e) => updateFormData({ studentName: e.target.value })}
+                        onChange={(e) =>
+                          updateFormData({ studentName: e.target.value })
+                        }
                         required
                       />
                     </div>
 
                     <div className="flex-1">
-                      <Label htmlFor="passport_photo" value="Passport Size Photo * (JPG/PNG, Max 2MB)" />
+                      <Label
+                        htmlFor="passport_photo"
+                        value="Passport Size Photo * (JPG/PNG, Max 2MB)"
+                      />
                       <FileInput
                         id="passport_photo"
                         accept="image/jpeg, image/png"
@@ -199,7 +291,9 @@ const DashboardSection = () => {
                               alert("Please upload an image smaller than 2MB");
                               return;
                             }
-                            if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                            if (
+                              !["image/jpeg", "image/png"].includes(file.type)
+                            ) {
                               alert("Only JPG or PNG files allowed");
                               return;
                             }
@@ -217,12 +311,16 @@ const DashboardSection = () => {
                       <Select
                         id="course"
                         value={formData.studentCourseName}
-                        onChange={(e) => updateFormData({ studentCourseName: e.target.value })}
+                        onChange={(e) =>
+                          updateFormData({ studentCourseName: e.target.value })
+                        }
                         required
                       >
                         <option value="">Select a course</option>
                         {courses.map((course) => (
-                          <option key={course.id} value={course.name}>{course.name}</option>
+                          <option key={course.id} value={course.name}>
+                            {course.name}
+                          </option>
                         ))}
                       </Select>
                     </div>
@@ -233,7 +331,9 @@ const DashboardSection = () => {
                         id="batch"
                         placeholder="Enter Batch (eg: 2021-2025)"
                         value={formData.studentBatch}
-                        onChange={(e) => updateFormData({ studentBatch: e.target.value })}
+                        onChange={(e) =>
+                          updateFormData({ studentBatch: e.target.value })
+                        }
                         required
                       />
                     </div>
@@ -246,20 +346,26 @@ const DashboardSection = () => {
                         id="roll_no"
                         placeholder="Enter Roll Number"
                         value={formData.studentRollNumber}
-                        onChange={(e) => updateFormData({ studentRollNumber: e.target.value })}
+                        onChange={(e) =>
+                          updateFormData({ studentRollNumber: e.target.value })
+                        }
                         required
                       />
                     </div>
 
                     <div className="flex-1">
-                      <Label htmlFor="phone" value="Phone Number * (10 digits)" />
+                      <Label
+                        htmlFor="phone"
+                        value="Phone Number * (10 digits)"
+                      />
                       <TextInput
                         id="phone"
                         placeholder="Enter Phone Number"
                         value={formData.studentPhoneNumber}
                         onChange={(e) => {
                           const value = e.target.value.replace(/[^0-9]/g, "");
-                          if (value.length <= 10) updateFormData({ studentPhoneNumber: value });
+                          if (value.length <= 10)
+                            updateFormData({ studentPhoneNumber: value });
                         }}
                         required
                       />
@@ -281,7 +387,9 @@ const DashboardSection = () => {
                       type="email"
                       placeholder="Enter Email"
                       value={formData.studentEmailAddress}
-                      onChange={(e) => updateFormData({ studentEmailAddress: e.target.value })}
+                      onChange={(e) =>
+                        updateFormData({ studentEmailAddress: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -292,7 +400,9 @@ const DashboardSection = () => {
                       id="address"
                       placeholder="Enter Address"
                       value={formData.studentAddress}
-                      onChange={(e) => updateFormData({ studentAddress: e.target.value })}
+                      onChange={(e) =>
+                        updateFormData({ studentAddress: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -301,21 +411,39 @@ const DashboardSection = () => {
             </div>
 
             <div className="flex justify-between p-4">
-              <Button type="button" color={currentPage === 1 ? "gray" : undefined} onClick={currentPage === 1 ? onCloseModal : handlePrevPage}>
+              <Button
+                type="button"
+                color={currentPage === 1 ? "gray" : undefined}
+                onClick={currentPage === 1 ? onCloseModal : handlePrevPage}
+              >
                 {currentPage === 1 ? "Cancel" : "Previous"}
               </Button>
-              <Button type={currentPage < 2 ? "button" : "submit"} onClick={currentPage < 2 ? handleNextPage : undefined}>
+              <Button
+                type={currentPage < 2 ? "button" : "submit"}
+                onClick={currentPage < 2 ? handleNextPage : undefined}
+              >
                 {currentPage < 2 ? "Next" : "Submit & Send Request"}
               </Button>
             </div>
           </form>
         </Modal>
 
-        <Button onClick={() => setOpenStatusModal(true)}>Track Status</Button>
+        <Button
+          onClick={() => setOpenStatusModal(true)}
+          color={"white"}
+          className="rounded-md font-semibold shadow"
+        >
+          Track Status
+        </Button>
 
-        <Modal show={openStatusModal} size="xl" onClose={onCloseStatusModal} popup>
+        <Modal
+          show={openStatusModal}
+          size="xl"
+          onClose={onCloseStatusModal}
+          popup
+        >
           <Modal.Header />
-          <div className="p-4 space-y-4">
+          <div className="space-y-4 p-4">
             <Label value="Ticket Number" />
             <TextInput
               value={ticketNumberInput}
@@ -323,41 +451,82 @@ const DashboardSection = () => {
               placeholder="Enter request ID"
               autoFocus
             />
-            <Button onClick={handleTrackStatusSubmit} disabled={!ticketNumberInput.trim()} className="w-full">
+            <Button
+              onClick={handleTrackStatusSubmit}
+              disabled={!ticketNumberInput.trim()}
+              className="w-full"
+            >
               Check Status
             </Button>
 
             {/* Status Results */}
             {approvalStatusList.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-center">
-                  Approval Status: {
-                    approvalStatusList.every((s) => s.status === "approved") ?
-                      <span className="text-green-600">Approved</span> :
-                      approvalStatusList.every((s) => s.status === "rejected") ?
-                      <span className="text-red-600">Rejected</span> :
-                      <span className="text-yellow-600">In Review</span>
-                  }
+                <h3 className="text-center text-xl font-semibold">
+                  Approval Status:{" "}
+                  {approvalStatusList.every((s) => s.status === "approved") ? (
+                    <span className="text-green-600">Approved</span>
+                  ) : approvalStatusList.every(
+                      (s) => s.status === "rejected",
+                    ) ? (
+                    <span className="text-red-600">Rejected</span>
+                  ) : (
+                    <span className="text-yellow-600">In Review</span>
+                  )}
                 </h3>
-                <Progress progress={progress} size="lg" color="blue" textLabel={`${progress}% complete`} textLabelPosition="inside" />
+                <Progress
+                  progress={progress}
+                  size="lg"
+                  color="blue"
+                  textLabel={`${progress}% complete`}
+                  textLabelPosition="inside"
+                />
                 <div className="space-y-2">
                   {approvalStatusList.map((status, index) => (
-                    <div key={index} className="flex justify-between border rounded-lg p-3">
+                    <div
+                      key={index}
+                      className="flex justify-between rounded-lg border p-3"
+                    >
                       <div>
-                        <div className="font-medium">{status.profile?.name || `Admin ${index + 1}`}</div>
+                        <div className="font-medium">
+                          {status.profile?.name || `Admin ${index + 1}`}
+                        </div>
                         {status.status === "rejected" && (
-                          <div className="text-sm text-red-600">Remark: {status.remarks || "No remarks"}</div>
+                          <div className="text-sm text-red-600">
+                            Remark: {status.remarks || "No remarks"}
+                          </div>
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className={`px-3 py-1 rounded-full text-sm capitalize ${
-                          status.status === "approved" ? "bg-green-100 text-green-800" :
-                          status.status === "rejected" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"}`}>
+                        <span
+                          className={`rounded-full px-3 py-1 text-sm capitalize ${
+                            status.status === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : status.status === "rejected"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
                           {status.status}
                         </span>
                         {status.status === "rejected" && (
-                          <Button size="xs" color="warning" onClick={() => handleReviewRequest(ticketNumberInput)} disabled={status.review_requested}>
-                            {status.review_requested ? <><HiCheck className="mr-1" /> Requested</> : <><HiRefresh className="mr-1" /> Re-Review</>}
+                          <Button
+                            size="xs"
+                            color="warning"
+                            onClick={() =>
+                              handleReviewRequest(ticketNumberInput)
+                            }
+                            disabled={status.review_requested}
+                          >
+                            {status.review_requested ? (
+                              <>
+                                <HiCheck className="mr-1" /> Requested
+                              </>
+                            ) : (
+                              <>
+                                <HiRefresh className="mr-1" /> Re-Review
+                              </>
+                            )}
                           </Button>
                         )}
                       </div>
@@ -367,14 +536,20 @@ const DashboardSection = () => {
               </div>
             )}
 
-            {trackError && <div className="text-center text-red-600">{trackError}</div>}
-            {isSubmitting && <div className="flex justify-center"><Spinner size="md" /></div>}
+            {trackError && (
+              <div className="text-center text-red-600">{trackError}</div>
+            )}
+            {isSubmitting && (
+              <div className="flex justify-center">
+                <Spinner size="md" />
+              </div>
+            )}
           </div>
         </Modal>
       </div>
 
       {showToast && (
-        <div className="fixed top-0 right-0 m-4 z-50">
+        <div className="fixed right-0 top-0 z-50 m-4">
           <ToastComponent />
         </div>
       )}

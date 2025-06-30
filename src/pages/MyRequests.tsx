@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "flowbite-react";
 import { HiClipboardCopy } from "react-icons/hi";
-import { supabase } from '../db/supabase';
-import PropTypes from 'prop-types';
+import { supabase } from "../db/supabase";
+import PropTypes from "prop-types";
 
 const RequestItem = ({ req, copiedId, handleCopy }) => (
-  <li className="flex items-center justify-between rounded-lg border bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex-1 min-w-0">
-      <p className="font-semibold text-gray-700 truncate">
-        Request ID: <span className="text-cyan-700 font-mono">{req.id}</span>
+  <li className="flex items-center justify-between rounded-lg border bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="min-w-0 flex-1">
+      <p className="truncate font-semibold text-gray-700">
+        Request ID: <span className="font-mono text-cyan-700">{req.id}</span>
       </p>
-      <p className={`text-sm font-medium capitalize ${
-        req.status === "approved" ? "text-green-600" :
-        req.status === "rejected" ? "text-red-600" :
-        "text-yellow-600"
-      }`}>
+      <p
+        className={`text-sm font-medium capitalize ${
+          req.status === "approved"
+            ? "text-green-600"
+            : req.status === "rejected"
+              ? "text-red-600"
+              : "text-yellow-600"
+        }`}
+      >
         Status: {req.status}
       </p>
-      <p className="text-sm text-gray-500 mt-1">
+      <p className="mt-1 text-sm text-gray-500">
         Created: {new Date(req.created_at).toLocaleDateString()}
       </p>
     </div>
@@ -66,7 +70,7 @@ const MyRequest = ({ currentUserId }) => {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadData = async () => {
       await fetchRequests();
     };
@@ -85,9 +89,9 @@ const MyRequest = ({ currentUserId }) => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">My NDC Requests</h2>
+        {/* <h2 className="text-2xl font-bold text-gray-800">My NDC Requests</h2> */}
         {requests.length > 0 && (
           <span className="text-sm text-gray-500">
             Showing {requests.length} requests
@@ -96,7 +100,7 @@ const MyRequest = ({ currentUserId }) => {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 rounded-lg">
+        <div className="rounded-lg bg-red-50 p-4">
           <p className="text-red-600">Error loading requests: {error}</p>
         </div>
       )}
@@ -106,7 +110,7 @@ const MyRequest = ({ currentUserId }) => {
           <Spinner size="lg" aria-label="Loading requests..." />
         </div>
       ) : requests.length === 0 ? (
-        <div className="p-6 text-center bg-gray-50 rounded-lg">
+        <div className="rounded-lg bg-gray-50 p-6 text-center">
           <p className="text-gray-500">No requests found.</p>
         </div>
       ) : (
@@ -126,7 +130,7 @@ const MyRequest = ({ currentUserId }) => {
             <div className="flex justify-center">
               <Button
                 color="light"
-                onClick={() => setLimit(prev => prev + 5)}
+                onClick={() => setLimit((prev) => prev + 5)}
                 className="mt-4"
               >
                 Load More
