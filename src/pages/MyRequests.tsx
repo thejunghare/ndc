@@ -4,7 +4,24 @@ import { HiClipboardCopy } from "react-icons/hi";
 import { supabase } from "../db/supabase";
 import PropTypes from "prop-types";
 
-const RequestItem = ({ req, copiedId, handleCopy }) => (
+interface Request {
+  id: string;
+  status: string;
+  created_at: string;
+  [key: string]: any;
+}
+
+interface RequestItemProps {
+  req: Request;
+  copiedId: string | null;
+  handleCopy: (requestId: string) => void;
+}
+
+interface MyRequestProps {
+  currentUserId: string; // This is the correct prop for MyRequest
+}
+
+const RequestItem = ({ req, copiedId, handleCopy }: RequestItemProps) => (
   <li className="flex items-center justify-between rounded-lg border bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
     <div className="min-w-0 flex-1">
       <p className="truncate font-semibold text-gray-700">
@@ -38,11 +55,12 @@ const RequestItem = ({ req, copiedId, handleCopy }) => (
   </li>
 );
 
-const MyRequest = ({ currentUserId }) => {
-  const [copiedId, setCopiedId] = useState(null);
-  const [requests, setRequests] = useState([]);
+const MyRequest = ({ currentUserId }: MyRequestProps) => {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [requests, setRequests] = useState<Request[]>([]);
+
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [limit, setLimit] = useState(5);
 
   const fetchRequests = async () => {
@@ -62,7 +80,7 @@ const MyRequest = ({ currentUserId }) => {
       setError(null);
     } catch (err) {
       console.error("Error fetching requests:", err);
-      setError(err.message);
+      setError((err as Error).message || "An unknown error occurred");
     } finally {
       setLoading(false);
     }
@@ -82,7 +100,7 @@ const MyRequest = ({ currentUserId }) => {
     };
   }, [currentUserId, limit]);
 
-  const handleCopy = (requestId) => {
+  const handleCopy = (requestId: string) => {
     navigator.clipboard.writeText(requestId);
     setCopiedId(requestId);
     setTimeout(() => setCopiedId(null), 1500);
