@@ -60,7 +60,7 @@ const FormContext = createContext<FormContextType | undefined>(undefined);
 export const FormProvider = ({ children }: { children: React.ReactNode }) => {
   const { current } = useUser();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [ndcTickets, setNdcTickets] = useState<ndcTickets[]>([]);
+  const [_ndcTickets, setNdcTickets] = useState<ndcTickets[]>([]);
   //console.log(course);
   const [formData, setFormData] = useState<PersonalDetailsFormData>({
     studentName: "",

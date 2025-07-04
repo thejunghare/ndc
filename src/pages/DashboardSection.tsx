@@ -35,7 +35,7 @@ const DashboardSection = () => {
     courses,
     listCourses,
   } = useForm();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, _setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {

@@ -25,7 +25,7 @@ const DashboardView = () => {
   const { current, logout } = useUser();
   const navigate = useNavigate();
 
-  const [userProfile, setUserProfile] = useState<{
+  const [_userProfile, setUserProfile] = useState<{
     username: string;
     designation: string;
   } | null>(null);

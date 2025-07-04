@@ -1,6 +1,6 @@
 // import { Button, Navbar } from "flowbite-react";
 
-const Header = ({ onLogout }: { onLogout?: () => void }) => (
+const Header = () => (
   <div>
     {/* <Navbar fluid rounded className="bg-white shadow-md dark:bg-gray-800">
       <Navbar.Brand href="">

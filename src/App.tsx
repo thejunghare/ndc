@@ -14,12 +14,12 @@ import NotFoundView from "./pages/NotFoundView";
 import ForgotPasswordView from "./pages/ForgotPasswordView";
 import CreateAccountView from "./pages/CreateAccountView";
 import AdminDashboard from "./pages/AdminDashboard";
-import Header from "./reuseables/Header";
+// import Header from "./reuseables/Header";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import RoleProtectedRoute from "./lib/RoleProtectedRoute";
 
 function AppContent() {
-  const { current, logout } = useUser();
+  const { current } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ function AppContent() {
 
   return (
     <>
-      {current && <Header onLogout={logout} />}
+      {/* {current && <Header onLogout={logout} />} */}
       <Routes>
         <Route
           path="/"
