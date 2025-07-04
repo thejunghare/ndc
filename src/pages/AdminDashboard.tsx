@@ -117,7 +117,7 @@ const AdminDashboard = () => {
       <div className="w-full p-6">
         <div className="mb-6 text-center">
           <p className="mb-1 text-sm text-gray-500">
-            Welcome, <span className="font-semibold">{current?.username}</span>
+            Welcome, <span className="font-semibold">{current?.email}</span>
           </p>
           <h2 className="text-3xl font-bold text-gray-800">
             Pending NDC Approvals
