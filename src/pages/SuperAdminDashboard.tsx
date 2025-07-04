@@ -417,7 +417,7 @@ const Sidebar = ({ selected, setSelected, logoutOption }: SidebarProps) => {
       <div className="space-y-1">
         <Option
           Icon={FiHome}
-          title="dashboard"
+          title="Dashboard"
           selected={selected}
           setSelected={setSelected}
           open={open}
@@ -513,7 +513,7 @@ const TitleSection = ({ open }: { open: boolean }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
             >
-              <span className="block text-xs font-semibold">NDC Portal</span>
+              <span className="block text-xs font-semibold">NDC SAdmin</span>
               <span className="block text-xs text-slate-500">ISU</span>
             </motion.div>
           )}

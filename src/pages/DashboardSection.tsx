@@ -123,7 +123,7 @@ const DashboardSection = () => {
       if (Array.isArray(result.statusList)) {
         setApprovalStatusList(result.statusList);
       } else {
-        setApprovalStatusList([]); // fallback to empty list
+        setApprovalStatusList([]);
       }
 
       setTrackError("");
@@ -134,10 +134,10 @@ const DashboardSection = () => {
     }
   };
 
-  const handleReviewRequest = async (requestId: string) => {
+  const handleReviewRequest = async (requestId: string, adminId?: string) => {
     try {
-      if (!requestId || typeof requestId !== "string") {
-        alert("Invalid request ID");
+      if (!requestId || !adminId) {
+        alert("Invalid request ID or admin ID");
         return;
       }
 
@@ -145,15 +145,15 @@ const DashboardSection = () => {
         .from("ndc_approval")
         .update({
           status: "pending",
-          review_requested: true,
-          decision: null,
-          remarks: null,
+          review_requested: false,
           updated_at: new Date().toISOString(),
         })
-        .eq("request_id", requestId);
+        .eq("request_id", requestId)
+        .eq("admin_id", adminId); // Add this filter to target specific admin
 
       if (resetError) throw resetError;
 
+      // Update main request timestamp (optional)
       const { error: requestError } = await supabase
         .from("ndc_part_one")
         .update({ updated_at: new Date().toISOString() })
@@ -165,11 +165,9 @@ const DashboardSection = () => {
       handleTrackStatusSubmit();
     } catch (err) {
       console.error("Review request error:", err);
-      if (err instanceof Error) {
-        alert(`Failed to request review: ${err.message}`);
-      } else {
-        alert(`Failed to request review: ${String(err)}`);
-      }
+      alert(
+        `Failed to request review: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
   };
 
@@ -454,7 +452,10 @@ const DashboardSection = () => {
                             size="xs"
                             color="warning"
                             onClick={() =>
-                              handleReviewRequest(ticketNumberInput)
+                              handleReviewRequest(
+                                ticketNumberInput,
+                                status.admin_id,
+                              )
                             }
                             disabled={status.review_requested}
                           >

@@ -22,7 +22,7 @@ interface MyRequestProps {
 }
 
 const RequestItem = ({ req, copiedId, handleCopy }: RequestItemProps) => (
-  <li className="flex items-center justify-between rounded-lg border bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+  <li className="flex items-center justify-between rounded-lg border p-4 shadow-sm transition-shadow hover:shadow-md">
     <div className="min-w-0 flex-1">
       <p className="truncate font-semibold text-gray-700">
         Request ID: <span className="font-mono text-cyan-700">{req.id}</span>
@@ -118,7 +118,7 @@ const MyRequest = ({ currentUserId }: MyRequestProps) => {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-4">
+        <div className="rounded-lg p-4">
           <p className="text-red-600">Error loading requests: {error}</p>
         </div>
       )}

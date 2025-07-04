@@ -276,7 +276,7 @@ const Sidebar = ({ selected, setSelected, logoutOption }: SidebarProps) => {
       <div className="space-y-1">
         <Option
           Icon={FiHome}
-          title="admin"
+          title="Dashboard"
           selected={selected}
           setSelected={setSelected}
           open={open}
