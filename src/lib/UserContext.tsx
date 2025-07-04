@@ -46,7 +46,7 @@ export function UserProvider({ children }: UserProviderProps) {
     initSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         if (session?.user) {
           setUser({
             id: session.user.id,
@@ -64,17 +64,17 @@ export function UserProvider({ children }: UserProviderProps) {
     );
 
     return () => {
-      authListener.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<void> => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) return { user: null, error };
+    if (error) throw { user: null, error };
 
     if (data.user) {
       setUser({
@@ -87,31 +87,31 @@ export function UserProvider({ children }: UserProviderProps) {
       });
     }
 
-    return { user: data.user, error: null };
+    //return { user: data.user, error: null };
   };
 
   const signUp = async (
     email: string,
     password: string,
-    username: string,
-    role: string,
-  ) => {
+    // username: string,
+    // role: string,
+  ): Promise<void> => {
     const { data, error } = await supabase.auth.signUp({ email, password });
 
-    if (error) return { user: null, error };
+    if (error) throw { user: null, error };
 
     if (data.user) {
       setUser({
         id: data.user.id,
         email: data.user.email ?? undefined,
-        username,
-        role,
+        username: data.user.user_metadata?.username ?? "N/A",
+        role: data.user.user_metadata?.role ?? "User",
         createdAt:
           data.user.user_metadata?.created_at || new Date().toISOString(),
       });
     }
 
-    return { user: data.user, error: null };
+    //return { user: data.user, error: null };
   };
 
   const handleLogout = async () => {

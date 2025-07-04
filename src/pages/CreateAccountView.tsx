@@ -1,5 +1,3 @@
-// TODO: fix resposnive desgin
-
 import { Button, Label, TextInput } from "flowbite-react";
 // import Header from "../reuseables/Header";
 import { useState } from "react";
@@ -38,11 +36,10 @@ const CreateAccountView = () => {
 
   return (
     <div className="flex min-h-screen">
-      <ToastContainer position="top-center" autoClose={4000} theme="colored"/>
+      <ToastContainer position="top-center" autoClose={4000} theme="colored" />
 
       {/* Left side image */}
-      <div 
-        className="m-8 hidden w-1/2 items-center justify-center rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-700 md:flex">
+      <div className="m-8 hidden w-1/2 items-center justify-center rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-700 md:flex">
         <div className="p-8 text-center">
           <h1
             className="mb-4 text-4xl

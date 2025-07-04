@@ -11,101 +11,22 @@ import {
   FileInput,
   Select,
 } from "flowbite-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import SpinnerComponent from "../reuseables/SpinnerComponent";
 import { useForm } from "../lib/ndcFormContext";
-import { useUser } from "../lib/UserContext";
+// import { useUser } from "../lib/UserContext";
 import { HiRefresh, HiCheck } from "react-icons/hi";
 import { supabase } from "../db/supabase";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
+import type { ApprovalStatus } from "../lib/trackApprovalStatus";
 import ToastComponent from "../reuseables/ToastComponent";
-import { FiLock } from "react-icons/fi";
-import { motion } from "framer-motion";
-
-const TARGET_TEXT = "Fill NDC";
-// const CYCLES_PER_LETTER = 2;
-// const SHUFFLE_TIME = 50;
-
-const CHARS = "!@#$%^&*():{};|,.<>/?";
-
-const EncryptButton = () => {
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const [text, setText] = useState(TARGET_TEXT);
-
-  const scramble = () => {
-    let pos = 0;
-
-    intervalRef.current = setInterval(() => {
-      const scrambled = TARGET_TEXT.split("")
-        .map((char, index) => {
-          if (pos / CYCLES_PER_LETTER > index) {
-            return char;
-          }
-
-          const randomCharIndex = Math.floor(Math.random() * CHARS.length);
-          const randomChar = CHARS[randomCharIndex];
-
-          return randomChar;
-        })
-        .join("");
-
-      setText(scrambled);
-      pos++;
-
-      if (pos >= TARGET_TEXT.length * CYCLES_PER_LETTER) {
-        stopScramble();
-      }
-    }, SHUFFLE_TIME);
-  };
-
-  const stopScramble = () => {
-    clearInterval(intervalRef.current || undefined);
-
-    setText(TARGET_TEXT);
-  };
-
-  return (
-    <motion.button
-      whileHover={{
-        scale: 1.025,
-      }}
-      whileTap={{
-        scale: 0.975,
-      }}
-      onMouseEnter={scramble}
-      onMouseLeave={stopScramble}
-      className="group relative overflow-hidden rounded-lg border-[1px] border-neutral-500 bg-neutral-700 px-4 py-2 font-mono font-medium uppercase text-neutral-300 transition-colors hover:text-indigo-300"
-    >
-      <div className="relative z-10 flex items-center gap-2">
-        <FiLock />
-        <span>{text}</span>
-      </div>
-      <motion.span
-        initial={{
-          y: "100%",
-        }}
-        animate={{
-          y: "-100%",
-        }}
-        transition={{
-          repeat: Infinity,
-          repeatType: "mirror",
-          duration: 1,
-          ease: "linear",
-        }}
-        className="absolute inset-0 z-0 scale-125 bg-gradient-to-t from-indigo-400/0 from-40% via-indigo-400/100 to-indigo-400/0 to-60% opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      />
-    </motion.button>
-  );
-};
 
 const DashboardSection = () => {
-  const [showSpinner, setShowSpinner] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const { current } = useUser();
-  const inputRef = useRef(null);
+  const [showSpinner, setShowSpinner] = useState<boolean>(false);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  // const { current } = useUser();
+  // const inputRef = useRef(null);
   const {
     formData,
     updateFormData,
@@ -142,7 +63,11 @@ const DashboardSection = () => {
   const [openStatusModal, setOpenStatusModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketNumberInput, setTicketNumberInput] = useState("");
-  const [approvalStatusList, setApprovalStatusList] = useState([]);
+  // const [approvalStatusList, setApprovalStatusList] = useState([]);
+  const [approvalStatusList, setApprovalStatusList] = useState<
+    ApprovalStatus[]
+  >([]);
+
   const [trackError, setTrackError] = useState("");
 
   const onCloseModal = () => setOpenModal(false);
@@ -156,7 +81,7 @@ const DashboardSection = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setOpenModal(false);
     setShowSpinner(true);
@@ -187,9 +112,20 @@ const DashboardSection = () => {
     if (!requestId) return alert("Please enter a ticket number");
 
     const result = await trackApprovalStatus(requestId);
+
     if (result.success) {
-      setProgress(result.progressPercent);
-      setApprovalStatusList(result.statusList);
+      if (typeof result.progressPercent === "number") {
+        setProgress(result.progressPercent);
+      } else {
+        setProgress(0); // or leave it unchanged
+      }
+
+      if (Array.isArray(result.statusList)) {
+        setApprovalStatusList(result.statusList);
+      } else {
+        setApprovalStatusList([]); // fallback to empty list
+      }
+
       setTrackError("");
     } else {
       setTrackError(result.error || "Error fetching status");
@@ -198,7 +134,7 @@ const DashboardSection = () => {
     }
   };
 
-  const handleReviewRequest = async (requestId) => {
+  const handleReviewRequest = async (requestId: string) => {
     try {
       if (!requestId || typeof requestId !== "string") {
         alert("Invalid request ID");
@@ -229,7 +165,11 @@ const DashboardSection = () => {
       handleTrackStatusSubmit();
     } catch (err) {
       console.error("Review request error:", err);
-      alert(`Failed to request review: ${err.message}`);
+      if (err instanceof Error) {
+        alert(`Failed to request review: ${err.message}`);
+      } else {
+        alert(`Failed to request review: ${String(err)}`);
+      }
     }
   };
 

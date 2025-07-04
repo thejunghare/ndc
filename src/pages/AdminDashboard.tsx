@@ -23,6 +23,12 @@ import { HiOutlineRefresh, HiOutlineEye } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 
+interface SidebarProps {
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string>>;
+  logoutOption: () => void;
+}
+
 const AdminDashboard = () => {
   const { current, logout } = useUser();
   const navigate = useNavigate();
@@ -254,7 +260,7 @@ const AdminDashboard = () => {
 export default AdminDashboard;
 
 // --- Sidebar Components ---
-const Sidebar = ({ selected, setSelected, logoutOption }) => {
+const Sidebar = ({ selected, setSelected, logoutOption }: SidebarProps) => {
   const [open, setOpen] = useState(true);
 
   return (

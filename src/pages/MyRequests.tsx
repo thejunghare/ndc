@@ -110,7 +110,7 @@ const MyRequest = ({ currentUserId }) => {
           <Spinner size="lg" aria-label="Loading requests..." />
         </div>
       ) : requests.length === 0 ? (
-        <div className="rounded-lg bg-gray-50 p-6 text-center">
+        <div className="rounded-lg p-6 text-center">
           <p className="text-gray-500">No requests found.</p>
         </div>
       ) : (

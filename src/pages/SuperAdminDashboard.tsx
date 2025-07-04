@@ -9,13 +9,18 @@ import {
   FiChevronDown,
   FiChevronsRight,
   FiHome,
-  FiEye,
   FiLogOut,
 } from "react-icons/fi";
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
+
+interface SidebarProps {
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string>>;
+  logoutOption: () => void;
+}
 
 interface Ticket {
   id: number;
@@ -27,18 +32,19 @@ interface Ticket {
   email: string;
   address: string;
   user_id: string;
-  photo_url: string;
-  status: string;
+  photo_url?: string;
+  status?: string;
   created_at: string;
   updated_at: string;
 }
 
 interface ApprovalStatus {
-  approved: number;
-  totalAdmins: number;
-  progressPercent: number;
-  statusList: any[];
+  approved?: number;
+  totalAdmins?: number;
+  progressPercent?: number;
+  statusList?: any[];
   success: boolean;
+  error?: string;
 }
 
 const SuperAdminDashboard = () => {
@@ -140,10 +146,12 @@ const SuperAdminDashboard = () => {
       .text("STUDENT DETAILS", 20, y);
     y += lineGap + 2;
 
-    try {
-      doc.addImage(ticket.photo_url, "JPEG", 140, 50, 50, 50);
-    } catch (e) {
-      console.warn("Image loading failed for PDF.");
+    if (ticket.photo_url) {
+      try {
+        doc.addImage(ticket.photo_url, "JPEG", 140, 50, 50, 50);
+      } catch (e) {
+        console.warn("Image loading failed for PDF.");
+      }
     }
 
     doc.setFontSize(10).setFont("helvetica", "normal");
@@ -307,7 +315,7 @@ const SuperAdminDashboard = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm text-gray-600">
+              <table className="min-w-full rounded-lg text-left text-sm text-gray-600">
                 <thead className="bg-white text-xs uppercase text-gray-700">
                   <tr>
                     <th className="px-4 py-3">NDC ID</th>
@@ -393,7 +401,7 @@ const SuperAdminDashboard = () => {
 export default SuperAdminDashboard;
 
 // Sidebar
-const Sidebar = ({ selected, setSelected, logoutOption }) => {
+const Sidebar = ({ selected, setSelected, logoutOption }: SidebarProps) => {
   const [open, setOpen] = useState(true);
 
   return (
@@ -572,6 +580,8 @@ const ToggleClose = ({
 };
 
 // Main content
-const ExampleContent = ({ renderSection }) => (
-  <div className="h-[200vh] w-full p-4">{renderSection()}</div>
-);
+// const ExampleContent = ({
+//   renderSection,
+// }: {
+//   renderSection: () => React.ReactNode;
+// }) => <div className="h-[200vh] w-full p-4">{renderSection()}</div>;

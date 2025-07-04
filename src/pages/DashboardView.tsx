@@ -15,6 +15,11 @@ import { supabase } from "../db/supabase";
 import MyRequest from "./MyRequests";
 import DashboardSection from "./DashboardSection";
 import { useNavigate } from "react-router-dom";
+interface SidebarProps {
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string>>;
+  logoutOption: () => void;
+}
 
 const DashboardView = () => {
   const { current, logout } = useUser();
@@ -86,7 +91,7 @@ const DashboardView = () => {
 export default DashboardView;
 
 // Sidebar
-const Sidebar = ({ selected, setSelected, logoutOption }) => {
+const Sidebar = ({ selected, setSelected, logoutOption }: SidebarProps) => {
   const [open, setOpen] = useState(true);
 
   return (
@@ -271,6 +276,12 @@ const ToggleClose = ({
 };
 
 // Main content
-const ExampleContent = ({ renderSection }) => (
-  <div className="h-[200vh] w-full p-4">{renderSection()}</div>
-);
+// const ExampleContent = ({ renderSection }) => (
+//   <div className="h-[200vh] w-full p-4">{renderSection()}</div>
+// );
+
+const ExampleContent = ({
+  renderSection,
+}: {
+  renderSection: () => React.ReactNode;
+}) => <div className="h-[200vh] w-full p-4">{renderSection()}</div>;
