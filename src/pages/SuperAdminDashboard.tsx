@@ -3,7 +3,7 @@ import { Spinner, Button, Select, Tooltip } from "flowbite-react";
 import { useUser } from "../lib/UserContext";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
 import jsPDF from "jspdf";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import { HiOutlineRefresh, HiDownload, HiClipboard } from "react-icons/hi";
 import {
   FiChevronDown,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import { useUser } from "../lib/UserContext";
 import { useNavigate } from "react-router-dom";
 import {

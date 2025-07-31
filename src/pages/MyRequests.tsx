@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "flowbite-react";
 import { HiClipboardCopy } from "react-icons/hi";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import PropTypes from "prop-types";
 
 interface Request {

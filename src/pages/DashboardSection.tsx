@@ -16,7 +16,7 @@ import SpinnerComponent from "../reuseables/SpinnerComponent";
 import { useForm } from "../lib/ndcFormContext";
 // import { useUser } from "../lib/UserContext";
 import { HiRefresh, HiCheck } from "react-icons/hi";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import { trackApprovalStatus } from "../lib/trackApprovalStatus";
 import type { ApprovalStatus } from "../lib/trackApprovalStatus";
 import ToastComponent from "../reuseables/ToastComponent";

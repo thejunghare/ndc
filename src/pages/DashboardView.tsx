@@ -11,7 +11,7 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import MyRequest from "./MyRequests";
 import DashboardSection from "./DashboardSection";
 import { useNavigate } from "react-router-dom";

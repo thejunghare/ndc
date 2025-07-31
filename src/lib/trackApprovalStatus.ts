@@ -1,4 +1,4 @@
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 
 export interface ApprovalStatus {
   admin_id: string;

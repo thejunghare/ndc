@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContextType, User } from "../types/auth";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 

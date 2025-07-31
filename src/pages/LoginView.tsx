@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import { useUser } from "../lib/UserContext";
 import { ToastContainer, toast } from "react-toastify";
 

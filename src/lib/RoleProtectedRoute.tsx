@@ -2,7 +2,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUser } from "./UserContext";
-import { supabase } from "../db/supabase";
+import { supabase } from "../db/supabase.tsx";
 import { Spinner } from "flowbite-react";
 import { toast } from "react-toastify";
 
